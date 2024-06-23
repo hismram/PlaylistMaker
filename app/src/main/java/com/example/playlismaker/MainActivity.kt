@@ -3,8 +3,6 @@ package com.example.playlismaker
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import android.view.View
-import android.widget.Toast
 import com.google.android.material.button.MaterialButton
 
 class MainActivity : ComponentActivity() {
