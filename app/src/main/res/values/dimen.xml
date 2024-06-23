@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Размеры текста -->
+    <dimen name="text_size_m">16sp</dimen>
+    <dimen name="text_size_l">22sp</dimen>
+    <dimen name="text_size_xl">26sp</dimen>
+
+    <dimen name="settings_row_height">61dp</dimen>
+
+    <dimen name="icon_m">24dp</dimen>
+
+    <!-- Размеры отступов -->
+    <dimen name="offset_s">10dp</dimen>
+    <dimen name="offset_m">16dp</dimen>
+    <dimen name="offset_l">24dp</dimen>
+</resources>
