@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Радиус скругления -->
+    <dimen name="corner_radius">16sp</dimen>
     <!-- Размеры текста -->
     <dimen name="text_size_m">16sp</dimen>
     <dimen name="text_size_l">22sp</dimen>
