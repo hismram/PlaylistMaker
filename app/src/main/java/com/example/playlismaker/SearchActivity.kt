@@ -31,7 +31,7 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 // Сохраняем результат ввода в переменную
-                searchString = s.toString();
+                searchString = s.toString()
             }
 
             override fun afterTextChanged(s: Editable?) {}
