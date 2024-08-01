@@ -50,6 +50,6 @@
         <item name="android:drawableStart">@drawable/search_icon_16</item>
         <item name="android:drawableTint">@color/input_icon</item>
         <item name="android:paddingLeft">@dimen/offset_s</item>
-        <item name="android:paddingRight">@dimen/offset_s</item>
+        <item name="android:paddingRight">@dimen/offset_xl</item>
     </style>
 </resources>
