@@ -6,6 +6,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.core.view.isVisible
+import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
     private var searchString: String = SEARCH_DEF
@@ -15,6 +17,8 @@ class SearchActivity : AppCompatActivity() {
 
         // Поле ввода
         val searchInput = findViewById<EditText>(R.id.search_input)
+        // Тулбар
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         // Кнопка сброса введенного значения
         val searchCross = findViewById<ImageView>(R.id.search_cross)
 
@@ -24,12 +28,8 @@ class SearchActivity : AppCompatActivity() {
 
             // Обработка изменения введенного значения
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    searchCross.visibility = ImageView.GONE
-                } else {
-                    searchCross.visibility = ImageView.VISIBLE
-                }
-
+                // Отображаем кнопку сброса только если есть введенное значение
+                searchCross.isVisible = !s.isNullOrEmpty()
                 // Сохраняем результат ввода в переменную
                 searchString = s.toString()
             }
@@ -38,9 +38,8 @@ class SearchActivity : AppCompatActivity() {
         })
 
         // Сброс поиска
-        searchCross.setOnClickListener {
-            searchInput.setText(SEARCH_DEF)
-        }
+        searchCross.setOnClickListener { searchInput.setText(SEARCH_DEF) }
+        toolbar.setOnClickListener{ finish() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
