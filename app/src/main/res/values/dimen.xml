@@ -12,7 +12,9 @@
     <dimen name="icon_m">24dp</dimen>
 
     <!-- Размеры отступов -->
+    <dimen name="offset_xs">8dp</dimen>
     <dimen name="offset_s">10dp</dimen>
     <dimen name="offset_m">16dp</dimen>
     <dimen name="offset_l">24dp</dimen>
+    <dimen name="offset_xl">28dp</dimen>
 </resources>

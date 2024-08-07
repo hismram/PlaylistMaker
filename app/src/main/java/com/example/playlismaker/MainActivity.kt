@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         val settings = findViewById<MaterialButton>(R.id.settings)
 
         search.setOnClickListener {
-            startActivity(Intent(this, Search::class.java))
+            startActivity(Intent(this, SearchActivity::class.java))
         }
 
         mediaLib.setOnClickListener {
