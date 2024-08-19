@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Радиус скругления -->
-    <dimen name="corner_radius">16sp</dimen>
+    <dimen name="menu_corner_radius">16dp</dimen>
+    <dimen name="track_cover_corner_radius">4</dimen>
     <!-- Размеры текста -->
+    <dimen name="text_size_s">11sp</dimen>
     <dimen name="text_size_m">16sp</dimen>
     <dimen name="text_size_l">22sp</dimen>
     <dimen name="text_size_xl">26sp</dimen>
 
-    <dimen name="settings_row_height">61dp</dimen>
+    <dimen name="row_height">61dp</dimen>
 
     <dimen name="icon_m">24dp</dimen>
 
