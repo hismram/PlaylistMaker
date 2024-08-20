@@ -8,7 +8,7 @@
         <item name="android:textColor">@color/yp_black</item>
         <item name="android:textSize">@dimen/text_size_l</item>
         <item name="textAllCaps">false</item>
-        <item name="cornerRadius">@dimen/corner_radius</item>
+        <item name="cornerRadius">@dimen/menu_corner_radius</item>
         <item name="iconTint">@color/yp_black</item>
         <item name="iconGravity">textStart</item>
         <item name="backgroundTint">@color/yp_white</item>
@@ -18,7 +18,7 @@
 
     <style name="SettingsRow">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/settings_row_height</item>
+        <item name="android:layout_height">@dimen/row_height</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textColor">@color/text_base</item>
         <item name="android:textSize">@dimen/text_size_m</item>
@@ -26,8 +26,38 @@
         <item name="fontFamily">@font/ys_display_regular</item>
     </style>
 
+    <style name="TrackCover">
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+    </style>
+
+    <style name="TrackName">
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/track_name</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/text_size_m</item>
+    </style>
+
+    <style name="TrackAdditional">
+        <item name="android:textColor">@color/track_additional</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/text_size_s</item>
+    </style>
+
+    <style name="TrackArtist" parent="TrackAdditional">
+        <item name="android:lines">1</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:drawableEnd">@drawable/dot</item>
+    </style>
+
+    <style name="TrackDuration" parent="TrackAdditional">
+        <item name="android:lines">1</item>
+    </style>
+
     <style name="InputLayout">
-        <item name="android:orientation">horizontal</item>
         <item name="android:background">@drawable/input_background</item>
     </style>
     <style name="InputCross">

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/row_height"
+    android:gravity="center_vertical"
+    android:paddingRight="@dimen/offset_m"
+    android:paddingLeft="@dimen/offset_m"
+>
+    <ImageView
+        style="@style/TrackCover"
+        android:id="@+id/track_cover"
+    />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/offset_xs"
+        android:layout_marginRight="@dimen/offset_xs"
+        android:layout_weight="1"
+    >
+        <TextView
+            style="@style/TrackName"
+            android:id="@+id/track_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Track name"
+        />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        >
+            <TextView
+                style="@style/TrackArtist"
+                android:id="@+id/track_artist"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                tools:text="Artist"
+            />
+            <TextView
+                style="@style/TrackDuration"
+                android:id="@+id/track_duration"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                tools:text="5:25"
+            />
+        </LinearLayout>
+    </LinearLayout>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/arrow_forward_icon"
+    />
+</LinearLayout>
