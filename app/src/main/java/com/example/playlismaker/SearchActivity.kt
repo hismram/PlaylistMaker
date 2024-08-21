@@ -164,11 +164,7 @@ class SearchActivity : AppCompatActivity() {
 
         tracksView.visibility = View.GONE
         tracksPlaceholder.visibility = View.VISIBLE
-        tracksPlaceholderReload.visibility = if (reload) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        tracksPlaceholderReload.isVisible = reload
     }
 
     /**
