@@ -4,6 +4,8 @@
     <string name="reload">Обновить</string>
     <string name="media_lib">Медиатека</string>
     <string name="settings">Настройки</string>
+    <string name="search_history_header">Вы искали</string>
+    <string name="search_history_clear">Очистить историю</string>
 
     <string name="empty_artist">Неизвестный исполнитель</string>
     <string name="empty_track_name">Без названия</string>

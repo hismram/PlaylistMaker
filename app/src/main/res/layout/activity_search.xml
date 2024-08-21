@@ -41,12 +41,38 @@
                         />
                 </FrameLayout>
         </FrameLayout>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tracks_view"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+                <TextView
+                    android:id="@+id/search_history_header"
+                    style="@style/SearchHeader"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center_vertical|center"
+                    android:text="@string/search_history_header"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tracks_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/search_history_clear"
+                    style="@style/BaseButton.ListButton"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/offset_m"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/offset_m"
+                    android:text="@string/search_history_clear"
+                    />
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -68,7 +94,7 @@
                     />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/tracks_view_placeholder_reload"
-                    style="@style/BaseButton.Reload"
+                    style="@style/BaseButton.ListButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
