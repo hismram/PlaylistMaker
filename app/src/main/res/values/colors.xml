@@ -13,6 +13,7 @@
     <color name="text_base">@color/yp_black</color>
     <color name="text_inverse">@color/yp_white</color>
 
+    <color name="button">@color/yp_black</color>
 
     <color name="input_icon">@color/yp_text_gray</color>
     <color name="input_background">@color/yp_light_gray</color>

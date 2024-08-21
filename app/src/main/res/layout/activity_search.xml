@@ -30,6 +30,8 @@
                             style="@style/Input"
                             android:layout_width="match_parent"
                             android:inputType="text"
+                            android:imeOptions="actionDone"
+                            android:singleLine="true"
                             android:hint="@string/search"
                         />
                         <ImageView
@@ -45,4 +47,34 @@
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/tracks_view_placeholder"
+                    style="@style/ListPlaceholderMsg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="@dimen/offset_m"
+                    android:paddingLeft="@dimen/offset_m"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:drawableTop="@drawable/not_found"
+                    android:textAlignment="center"
+                    android:text=""
+                    tools:text="@string/network_error"
+                    />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/tracks_view_placeholder_reload"
+                    style="@style/BaseButton.Reload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/offset_m"
+                    android:visibility="gone"
+                    android:text="@string/reload"
+                />
+        </LinearLayout>
 </LinearLayout>
