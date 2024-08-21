@@ -1,34 +1,51 @@
 package com.example.playlismaker
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlismaker.service.ITunesService
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
 
 class SearchActivity : AppCompatActivity() {
     private var searchString: String = SEARCH_DEF
+
+    // Сервис ITunes
+    private val service = ITunesService()
+
+    // Список треков
+    private val tracksList = ArrayList<Track>()
+    private val tracksAdapter = TracksAdapter(tracksList)
+    private var placeholderImg: Int = R.drawable.not_found
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var searchInput: EditText
+    private lateinit var searchCross: ImageView
+    private lateinit var tracksView: RecyclerView
+    private lateinit var tracksPlaceholder: TextView
+    private lateinit var tracksPlaceholderReload: MaterialButton
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        // Поле ввода
-        val searchInput = findViewById<EditText>(R.id.search_input)
-        // Тулбар
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        // Кнопка сброса введенного значения
-        val searchCross = findViewById<ImageView>(R.id.search_cross)
-        // Список треков
-        val tracksView = findViewById<RecyclerView>(R.id.tracks_view)
-        // Адаптер списка треков
-        val tracksAdapter = TracksAdapter(MOCK_LIST)
+        searchInput = findViewById(R.id.search_input)
+        toolbar = findViewById(R.id.toolbar)
+        searchCross = findViewById(R.id.search_cross)
+        tracksView = findViewById(R.id.tracks_view)
+        tracksPlaceholder = findViewById(R.id.tracks_view_placeholder)
+        tracksPlaceholderReload = findViewById(R.id.tracks_view_placeholder_reload)
 
         tracksView.adapter = tracksAdapter
-        // Обработчики ввода
+
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -43,70 +60,146 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Сброс поиска
-        searchCross.setOnClickListener { searchInput.setText(SEARCH_DEF) }
-        toolbar.setOnClickListener{ finish() }
+
+        searchInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                search()
+                true
+            }
+            false
+        }
+        tracksPlaceholderReload.setOnClickListener { search() }
+        searchCross.setOnClickListener { resetSearch() }
+        toolbar.setOnClickListener { finish() }
     }
 
+    /**
+     * Сохраняет состояние
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
         // Сохраняем состояние
         outState.putString(SEARCH_STRING, searchString)
+        outState.putInt(PLACEHOLDER_VISIBILITY, tracksPlaceholder.visibility)
+        outState.putString(PLACEHOLDER_MSG, tracksPlaceholder.text.toString())
+        outState.putInt(PLACEHOLDER_IMG, placeholderImg)
+        outState.putInt(PLACEHOLDER_BTN_VISIBILITY, tracksPlaceholderReload.visibility)
+        outState.putInt(LIST_VISIBILITY, tracksView.visibility)
     }
 
-    // Восстанавливаем состояние
+    /**
+     * Восстанавливпет состояние
+     */
     override fun onRestoreInstanceState(
         savedInstanceState: Bundle
     ) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        val searchInput = findViewById<EditText>(R.id.search_input)
+        val listVisibility = savedInstanceState.getInt(LIST_VISIBILITY)
+        val placeholderVisibility = savedInstanceState.getInt(PLACEHOLDER_VISIBILITY)
+        val placeholderMsg = savedInstanceState.getString(PLACEHOLDER_MSG)
+        val placeholderImg = savedInstanceState.getInt(PLACEHOLDER_IMG)
+        val placeholderBtnVisibility = savedInstanceState.getInt(PLACEHOLDER_BTN_VISIBILITY)
 
         searchString = savedInstanceState.getString(SEARCH_STRING, SEARCH_DEF)
         searchInput.setText(searchString)
+        tracksView.visibility = listVisibility
+        tracksPlaceholder.visibility = placeholderVisibility
+        tracksPlaceholder.setCompoundDrawablesWithIntrinsicBounds(
+            0, placeholderImg, 0, 0
+        )
+        tracksPlaceholder.text = placeholderMsg
+        tracksPlaceholderReload.visibility = placeholderBtnVisibility
+
+    }
+
+    /**
+     * Запускает поиск, заполняеет список треков результом или показывает заглушку
+     */
+    private fun search() {
+        val context = searchInput.context
+
+        if (searchInput.text.isNotEmpty()) {
+            service.search(searchInput.text.toString(), {
+                if (it?.isNotEmpty() == true) {
+                    showList()
+                    tracksList.clear()
+                    tracksList.addAll(it)
+                    tracksAdapter.notifyDataSetChanged()
+                } else {
+                    showPlaceholder(
+                        context.getString(R.string.not_found),
+                        R.drawable.not_found,
+                        false
+                    )
+                }
+            }, {
+                showPlaceholder(
+                    context.getString(R.string.network_error),
+                    R.drawable.network_error,
+                    true
+                )
+            })
+        }
+    }
+
+    /**
+     * Показывает заглушку, скрывает реестр
+     *
+     * @param msg Текст сообщения в заглушке
+     * @param imgId Идентификатор картинки заглушки
+     * @param reload Флаг показа кнопки перезагрузки
+     */
+    private fun showPlaceholder(msg: String, imgId: Int, reload: Boolean) {
+        tracksPlaceholder.text = msg
+
+        placeholderImg = imgId
+        tracksPlaceholder.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            placeholderImg,
+            0,
+            0
+        )
+
+        tracksView.visibility = View.GONE
+        tracksPlaceholder.visibility = View.VISIBLE
+        tracksPlaceholderReload.isVisible = reload
+    }
+
+    /**
+     * Скрывает заглушку, показывает реестр
+     */
+    private fun showList() {
+        tracksPlaceholder.visibility = View.GONE
+        tracksPlaceholderReload.visibility = View.GONE
+        tracksView.visibility = View.VISIBLE
+    }
+
+    /**
+     * Сбрасывает строку и результаты поиска, скрывает заглушки, показывает список
+     */
+    private fun resetSearch() {
+        val view = this.currentFocus
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+
+        if (view != null) {
+            inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+        searchInput.setText(SEARCH_DEF)
+        tracksList.clear()
+        tracksAdapter.notifyDataSetChanged()
+        showList()
     }
 
     companion object {
         const val SEARCH_STRING = "SEARCH_STRING"
+        const val PLACEHOLDER_VISIBILITY = "PLACEHOLDER_VISIBILITY"
+        const val PLACEHOLDER_MSG = "PLACEHOLDER_MSG"
+        const val PLACEHOLDER_IMG = "PLACEHOLDER_IMG"
+        const val PLACEHOLDER_BTN_VISIBILITY = "PLACEHOLDER_BTN_VISIBILITY"
+        const val LIST_VISIBILITY = "LIST_VISIBILITY"
         const val SEARCH_DEF = ""
-        val MOCK_LIST = arrayListOf<Track> (
-            Track(
-                "Smells Like Teen Spirit",
-                "Nirvana",
-                "5:01",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Billie Jean",
-                "Michael Jackson",
-                "4:35",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Stayin' Alive",
-                "Bee Gees",
-                "4:10",
-                "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Whole Lotta Love",
-                "Led Zeppelin",
-                "5:33",
-                "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Sweet Child O'Mine",
-                "Guns N' Roses",
-                "5:03",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            ),
-            Track(
-                "Sweet Child O'MineSweet Child O'MineSweet Child O'MineSweet Child O'MineSweet Child O'MineSweet Child O'Mine",
-                "Guns N' RosesGuns N' RosesGuns N' RosesGuns N' RosesGuns N' RosesGuns N' RosesGuns N' RosesGuns N' RosesGuns N' Roses",
-                "5:03",
-                "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
-            )
-        )
     }
 }

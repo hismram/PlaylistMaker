@@ -2,12 +2,15 @@
 <resources>
     <!-- Радиус скругления -->
     <dimen name="menu_corner_radius">16dp</dimen>
+    <dimen name="button_corner_radius">54dp</dimen>
     <dimen name="track_cover_corner_radius">4</dimen>
     <!-- Размеры текста -->
-    <dimen name="text_size_s">11sp</dimen>
+    <dimen name="text_size_xs">11sp</dimen>
+    <dimen name="text_size_s">14sp</dimen>
     <dimen name="text_size_m">16sp</dimen>
-    <dimen name="text_size_l">22sp</dimen>
-    <dimen name="text_size_xl">26sp</dimen>
+    <dimen name="text_size_l">19sp</dimen>
+    <dimen name="text_size_xl">22sp</dimen>
+    <dimen name="text_size_2xl">26sp</dimen>
 
     <dimen name="row_height">61dp</dimen>
 
@@ -19,4 +22,5 @@
     <dimen name="offset_m">16dp</dimen>
     <dimen name="offset_l">24dp</dimen>
     <dimen name="offset_xl">28dp</dimen>
+    <dimen name="offset_2xl">54dp</dimen>
 </resources>

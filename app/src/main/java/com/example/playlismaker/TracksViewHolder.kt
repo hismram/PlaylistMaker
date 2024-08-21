@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TracksViewHolder(trackView: View): RecyclerView.ViewHolder(trackView) {
     private val trackCover: ImageView = trackView.findViewById(R.id.track_cover)
@@ -16,30 +18,52 @@ class TracksViewHolder(trackView: View): RecyclerView.ViewHolder(trackView) {
     private val trackDuration: TextView = trackView.findViewById(R.id.track_duration)
 
     fun bind(model: Track) {
+        val context = trackCover.context
+
         Glide.with(trackCover)
-            .load(model.artWorkUrl100)
+            .load(model.artworkUrl100)
             .placeholder(R.drawable.cover_placeholder)
             .transform(RoundedCorners(
-                    dpToPx(
-                        trackCover.context.resources.getFloat(R.dimen.track_cover_corner_radius),
-                        trackCover.context
+                    context.resources.getFloat(R.dimen.track_cover_corner_radius).dpToPx(
+                        context
                     )
                 )
             )
             .into(trackCover)
 
-        trackName.text = model.trackName
-        trackArtist.text = model.artistName
-        trackDuration.text = model.trackTime
+        trackName.text =
+            if (model.trackName.isNullOrEmpty()) {
+                context.getString(R.string.empty_track_name)
+            } else {
+                model.trackName
+            }
+
+        trackArtist.text = if (model.trackName.isNullOrEmpty()) {
+            context.getString(R.string.empty_artist)
+        } else {
+            model.artistName
+        }
+
+        trackDuration.text = if (!model.trackTime.isNullOrEmpty()) {
+            model.trackTime
+        } else if (model.trackTimeMillis != null) {
+            SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
+        } else {
+            trackDuration.visibility = View.GONE
+            ""
+        }
     }
 
-
-    private fun dpToPx(dp: Float, context: Context): Int {
+    /**
+     * Добавляет возможность конвертации в dp
+     *
+     * @param context контекст для обращения к ресурсам
+     */
+    private fun Float.dpToPx(context: Context): Int {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            dp,
+            this,
             context.resources.displayMetrics
         ).toInt()
     }
-
 }

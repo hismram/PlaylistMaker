@@ -23,7 +23,7 @@ class SettingsActivity : ComponentActivity() {
         termsOfUseBtn.setOnClickListener { termsOfUse() }
     }
 
-    fun share() {
+    private fun share() {
         val intent = Intent(Intent.ACTION_SEND)
 
         intent.putExtra(
@@ -36,7 +36,7 @@ class SettingsActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    fun writeToSupport() {
+    private fun writeToSupport() {
         val intent = Intent(Intent.ACTION_SENDTO)
 
         intent.setType("text/plain")
@@ -48,7 +48,7 @@ class SettingsActivity : ComponentActivity() {
         startActivity(intent)
     }
 
-    fun termsOfUse() {
+    private fun termsOfUse() {
         val uri = Uri.parse(this.getString(R.string.terms_of_use_link))
         startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
