@@ -23,11 +23,14 @@ class SearchActivity : AppCompatActivity() {
     // Сервис ITunes
     private val service = ITunesService()
 
-    // Список треков
-    private val tracksList = ArrayList<Track>()
-    private val tracksAdapter = TracksAdapter(tracksList)
     private var placeholderImg: Int = R.drawable.not_found
+    // Список треков
+    private val tracksList: ArrayList<Track> = ArrayList()
+    private lateinit var tracksAdapter: TracksAdapter
+    private lateinit var historyController: SearchHistory
     private lateinit var toolbar: MaterialToolbar
+    private lateinit var searchHistoryHeader:TextView
+    private lateinit var searchHistoryClear:MaterialButton
     private lateinit var searchInput: EditText
     private lateinit var searchCross: ImageView
     private lateinit var tracksView: RecyclerView
@@ -37,14 +40,34 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        searchInput = findViewById(R.id.search_input)
+        historyController = SearchHistory(getSharedPreferences(App.PREFERENCES_STORAGE_ID, MODE_PRIVATE))
+        //tracksList.addAll(historyController.getList())
+        tracksAdapter = TracksAdapter(tracksList) {
+            historyController.add(it)
+        }
         toolbar = findViewById(R.id.toolbar)
+        searchHistoryHeader = findViewById(R.id.search_history_header)
+        searchHistoryClear = findViewById(R.id.search_history_clear)
+        searchInput = findViewById(R.id.search_input)
         searchCross = findViewById(R.id.search_cross)
         tracksView = findViewById(R.id.tracks_view)
         tracksPlaceholder = findViewById(R.id.tracks_view_placeholder)
         tracksPlaceholderReload = findViewById(R.id.tracks_view_placeholder_reload)
 
         tracksView.adapter = tracksAdapter
+
+        searchHistoryClear.setOnClickListener {
+            historyController.clear()
+            tracksList.clear()
+            hideHistory()
+        }
+        searchInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && searchInput.text.isEmpty()) {
+                showHistory()
+            } else {
+                hideHistory()
+            }
+        }
 
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -53,6 +76,11 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 // Отображаем кнопку сброса только если есть введенное значение
                 searchCross.isVisible = !s.isNullOrEmpty()
+                if (searchInput.hasFocus() && s.isNullOrEmpty()) {
+                    showHistory()
+                } else {
+                    hideHistory()
+                }
                 // Сохраняем результат ввода в переменную
                 searchString = s.toString()
             }
@@ -71,6 +99,8 @@ class SearchActivity : AppCompatActivity() {
         tracksPlaceholderReload.setOnClickListener { search() }
         searchCross.setOnClickListener { resetSearch() }
         toolbar.setOnClickListener { finish() }
+
+        searchInput.requestFocus()
     }
 
     /**
@@ -167,6 +197,23 @@ class SearchActivity : AppCompatActivity() {
         tracksPlaceholderReload.isVisible = reload
     }
 
+    private fun showHistory() {
+        tracksList.clear()
+        tracksList.addAll(historyController.getList())
+
+        searchHistoryHeader.isVisible = tracksList.isNotEmpty()
+        searchHistoryClear.isVisible = tracksList.isNotEmpty()
+
+        tracksAdapter.notifyDataSetChanged()
+    }
+
+    private fun hideHistory() {
+        searchHistoryClear.isVisible = false
+        searchHistoryHeader.isVisible = false
+        tracksList.clear()
+        tracksAdapter.notifyDataSetChanged()
+    }
+
     /**
      * Скрывает заглушку, показывает реестр
      */
@@ -189,6 +236,7 @@ class SearchActivity : AppCompatActivity() {
         }
         searchInput.setText(SEARCH_DEF)
         tracksList.clear()
+        tracksList.addAll(historyController.getList())
         tracksAdapter.notifyDataSetChanged()
         showList()
     }

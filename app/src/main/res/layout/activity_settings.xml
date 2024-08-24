@@ -23,6 +23,7 @@
         android:paddingRight="@dimen/offset_m"
     >
         <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/theme_switcher"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/dark_theme"

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,11 +14,17 @@ class SettingsActivity : ComponentActivity() {
         setContentView(R.layout.activity_settings)
 
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.theme_switcher)
         val shareBtn = findViewById<TextView>(R.id.share)
         val writeToSupportBtn = findViewById<TextView>(R.id.write_to_support)
         val termsOfUseBtn = findViewById<TextView>(R.id.terms_of_use)
 
+
+        themeSwitcher.isChecked = (applicationContext as App).darkTheme
         toolbar.setOnClickListener { finish() }
+        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+            changeTheme(checked)
+        }
         shareBtn.setOnClickListener { share() }
         writeToSupportBtn.setOnClickListener { writeToSupport() }
         termsOfUseBtn.setOnClickListener { termsOfUse() }
@@ -34,6 +41,10 @@ class SettingsActivity : ComponentActivity() {
 
 
         startActivity(intent)
+    }
+
+    private fun changeTheme(checked: Boolean) {
+        (applicationContext as App).switchTheme(checked)
     }
 
     private fun writeToSupport() {
