@@ -7,6 +7,12 @@
     <string name="search_history_header">Вы искали</string>
     <string name="search_history_clear">Очистить историю</string>
 
+    <string name="duration">Длительность</string>
+    <string name="album">Альбом</string>
+    <string name="year">Год</string>
+    <string name="genre">Жанр</string>
+    <string name="country">Страна</string>
+
     <string name="empty_artist">Неизвестный исполнитель</string>
     <string name="empty_track_name">Без названия</string>
 

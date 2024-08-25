@@ -18,8 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:gravity="center"
-            android:paddingLeft="@dimen/offset_m"
-            android:paddingRight="@dimen/offset_m">
+            android:paddingLeft="@dimen/offset_s"
+            android:paddingRight="@dimen/offset_s">
                 <FrameLayout
                     style="@style/InputLayout"
                     android:layout_gravity="center"
@@ -67,9 +67,9 @@
                     android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/offset_m"
+                    android:layout_marginBottom="@dimen/offset_s"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/offset_m"
+                    android:layout_marginTop="@dimen/offset_s"
                     android:text="@string/search_history_clear"
                     />
         </LinearLayout>
@@ -83,8 +83,8 @@
                     style="@style/ListPlaceholderMsg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="@dimen/offset_m"
-                    android:paddingLeft="@dimen/offset_m"
+                    android:paddingRight="@dimen/offset_s"
+                    android:paddingLeft="@dimen/offset_s"
                     android:layout_gravity="center"
                     android:visibility="gone"
                     android:drawableTop="@drawable/not_found"
@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/offset_m"
+                    android:layout_marginTop="@dimen/offset_s"
                     android:visibility="gone"
                     android:text="@string/reload"
                 />

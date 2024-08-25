@@ -19,8 +19,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginTop="@dimen/offset_l"
-        android:paddingLeft="@dimen/offset_m"
-        android:paddingRight="@dimen/offset_m"
+        android:paddingLeft="@dimen/offset_s"
+        android:paddingRight="@dimen/offset_s"
     >
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/theme_switcher"

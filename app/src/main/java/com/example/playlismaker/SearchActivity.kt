@@ -1,6 +1,7 @@
 package com.example.playlismaker
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -41,9 +42,13 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         historyController = SearchHistory(getSharedPreferences(App.PREFERENCES_STORAGE_ID, MODE_PRIVATE))
-        //tracksList.addAll(historyController.getList())
         tracksAdapter = TracksAdapter(tracksList) {
             historyController.add(it)
+            val intent = Intent(this, PlayerActivity::class.java)
+
+            intent.putExtra(PlayerActivity.TRACK_DATA, it.toJSON())
+
+            startActivity(intent)
         }
         toolbar = findViewById(R.id.toolbar)
         searchHistoryHeader = findViewById(R.id.search_history_header)

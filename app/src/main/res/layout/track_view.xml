@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/row_height"
     android:gravity="center_vertical"
-    android:paddingRight="@dimen/offset_m"
-    android:paddingLeft="@dimen/offset_m"
+    android:paddingRight="@dimen/offset_s"
+    android:paddingLeft="@dimen/offset_s"
 >
     <ImageView
         style="@style/TrackCover"
@@ -17,8 +17,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginLeft="@dimen/offset_xs"
-        android:layout_marginRight="@dimen/offset_xs"
+        android:layout_marginLeft="@dimen/offset_3xs"
+        android:layout_marginRight="@dimen/offset_3xs"
         android:layout_weight="1"
     >
         <TextView
