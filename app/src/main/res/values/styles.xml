@@ -18,7 +18,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:layout_marginTop">@dimen/offset_s</item>
+        <item name="android:layout_marginTop">@dimen/offset_2xs</item>
         <item name="android:textColor">@color/yp_black</item>
         <item name="android:textSize">@dimen/text_size_xl</item>
         <item name="cornerRadius">@dimen/menu_corner_radius</item>
@@ -67,7 +67,7 @@
     <style name="TrackAdditional">
         <item name="android:textColor">@color/track_additional</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
-        <item name="android:textSize">@dimen/text_size_xs</item>
+        <item name="android:textSize">@dimen/text_size_2xs</item>
     </style>
 
     <style name="TrackArtist" parent="TrackAdditional">
@@ -89,7 +89,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:src">@drawable/clear_icon</item>
-        <item name="android:padding">@dimen/offset_xs</item>
+        <item name="android:padding">@dimen/offset_3xs</item>
         <item name="android:layout_gravity">right|center_vertical</item>
     </style>
 
@@ -102,10 +102,37 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textColorHint">@color/input_text</item>
         <item name="android:textColor">@color/yp_black</item>
-        <item name="android:drawablePadding">@dimen/offset_xs</item>
+        <item name="android:drawablePadding">@dimen/offset_3xs</item>
         <item name="android:drawableStart">@drawable/search_icon_16</item>
         <item name="android:drawableTint">@color/input_icon</item>
-        <item name="android:paddingLeft">@dimen/offset_s</item>
-        <item name="android:paddingRight">@dimen/offset_xl</item>
+        <item name="android:paddingLeft">@dimen/offset_2xs</item>
+        <item name="android:paddingRight">@dimen/offset_2xl</item>
+    </style>
+
+    <style name="PlayerTrackMain">
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">@color/text_base</item>
+    </style>
+
+    <style name="PlayerTrackData">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">@dimen/text_size_xs</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+
+    <style name="PlayerTrackData.Label">
+        <item name="android:textColor">@color/yp_text_gray</item>
+    </style>
+
+    <style name="PlayerTrackData.Data">
+        <item name="android:gravity">end|center_vertical</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/text_base</item>
+        <item name="android:lines">1</item>
     </style>
 </resources>

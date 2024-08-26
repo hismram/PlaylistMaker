@@ -4,8 +4,10 @@
     <dimen name="menu_corner_radius">16dp</dimen>
     <dimen name="button_corner_radius">54dp</dimen>
     <dimen name="track_cover_corner_radius">4</dimen>
+    <dimen name="track_cover_large_corner_radius">8</dimen>
     <!-- Размеры текста -->
-    <dimen name="text_size_xs">11sp</dimen>
+    <dimen name="text_size_2xs">11sp</dimen>
+    <dimen name="text_size_xs">13sp</dimen>
     <dimen name="text_size_s">14sp</dimen>
     <dimen name="text_size_m">16sp</dimen>
     <dimen name="text_size_l">19sp</dimen>
@@ -17,10 +19,15 @@
     <dimen name="icon_m">24dp</dimen>
 
     <!-- Размеры отступов -->
-    <dimen name="offset_xs">8dp</dimen>
-    <dimen name="offset_s">10dp</dimen>
-    <dimen name="offset_m">16dp</dimen>
+    <dimen name="offset_4xs">4dp</dimen>
+    <dimen name="offset_3xs">8dp</dimen>
+    <dimen name="offset_2xs">10dp</dimen>
+    <dimen name="offset_xs">12dp</dimen>
+    <dimen name="offset_s">16dp</dimen>
+    <dimen name="offset_m">20dp</dimen>
     <dimen name="offset_l">24dp</dimen>
-    <dimen name="offset_xl">28dp</dimen>
-    <dimen name="offset_2xl">54dp</dimen>
+    <dimen name="offset_xl">26dp</dimen>
+    <dimen name="offset_2xl">28dp</dimen>
+    <dimen name="offset_3xl">30dp</dimen>
+    <dimen name="offset_4xl">54dp</dimen>
 </resources>
