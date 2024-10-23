@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -11,6 +13,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -34,27 +37,28 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistoryClear:MaterialButton
     private lateinit var searchInput: EditText
     private lateinit var searchCross: ImageView
+    private lateinit var searchProgressBar: ProgressBar
     private lateinit var tracksView: RecyclerView
     private lateinit var tracksPlaceholder: TextView
     private lateinit var tracksPlaceholderReload: MaterialButton
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { search() }
+    private var trackClickAllowed = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         historyController = SearchHistory(getSharedPreferences(App.PREFERENCES_STORAGE_ID, MODE_PRIVATE))
         tracksAdapter = TracksAdapter(tracksList) {
-            historyController.add(it)
-            val intent = Intent(this, PlayerActivity::class.java)
-
-            intent.putExtra(PlayerActivity.TRACK_DATA, it.toJSON())
-
-            startActivity(intent)
+            if (trackClickAllowed()) openPlayer(it)
         }
         toolbar = findViewById(R.id.toolbar)
         searchHistoryHeader = findViewById(R.id.search_history_header)
         searchHistoryClear = findViewById(R.id.search_history_clear)
         searchInput = findViewById(R.id.search_input)
         searchCross = findViewById(R.id.search_cross)
+        searchProgressBar = findViewById(R.id.search_progress_bar)
         tracksView = findViewById(R.id.tracks_view)
         tracksPlaceholder = findViewById(R.id.tracks_view_placeholder)
         tracksPlaceholderReload = findViewById(R.id.tracks_view_placeholder_reload)
@@ -88,11 +92,11 @@ class SearchActivity : AppCompatActivity() {
                 }
                 // Сохраняем результат ввода в переменную
                 searchString = s.toString()
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
-
 
         searchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -150,12 +154,48 @@ class SearchActivity : AppCompatActivity() {
     }
 
     /**
+     * debounce клика по треку
+     */
+    private fun trackClickAllowed(): Boolean {
+        val current = trackClickAllowed
+
+        if (trackClickAllowed) {
+            trackClickAllowed = false
+            handler.postDelayed({trackClickAllowed = true}, TRACK_CLICK_DELAY)
+        }
+
+        return current
+    }
+
+    /**
+     * Открывает экран плеера
+     * @param track Данные трека для плеера
+     */
+    private fun openPlayer(track: Track) {
+        historyController.add(track)
+        val intent = Intent(this, PlayerActivity::class.java)
+
+        intent.putExtra(PlayerActivity.TRACK_DATA, track.toJSON())
+
+        startActivity(intent)
+    }
+
+    /**
+     * Запускает отложенную задачу на запуск поиска
+     */
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DELAY)
+    }
+
+    /**
      * Запускает поиск, заполняеет список треков результом или показывает заглушку
      */
     private fun search() {
         val context = searchInput.context
 
         if (searchInput.text.isNotEmpty()) {
+            showSearchProgressBar()
             service.search(searchInput.text.toString(), {
                 if (it?.isNotEmpty() == true) {
                     showList()
@@ -197,11 +237,15 @@ class SearchActivity : AppCompatActivity() {
             0
         )
 
+        searchProgressBar.visibility = View.GONE
         tracksView.visibility = View.GONE
         tracksPlaceholder.visibility = View.VISIBLE
         tracksPlaceholderReload.isVisible = reload
     }
 
+    /**
+     * Показывает список истории поиска
+     */
     private fun showHistory() {
         tracksList.clear()
         tracksList.addAll(historyController.getList())
@@ -212,6 +256,9 @@ class SearchActivity : AppCompatActivity() {
         tracksAdapter.notifyDataSetChanged()
     }
 
+    /**
+     * Скрывает историю поиска
+     */
     private fun hideHistory() {
         searchHistoryClear.isVisible = false
         searchHistoryHeader.isVisible = false
@@ -225,7 +272,19 @@ class SearchActivity : AppCompatActivity() {
     private fun showList() {
         tracksPlaceholder.visibility = View.GONE
         tracksPlaceholderReload.visibility = View.GONE
+        searchProgressBar.visibility = View.GONE
         tracksView.visibility = View.VISIBLE
+    }
+
+    /**
+     * Показывает ожиданчик
+     */
+    private fun showSearchProgressBar() {
+        tracksPlaceholder.visibility = View.GONE
+        tracksPlaceholderReload.visibility = View.GONE
+        tracksView.visibility = View.GONE
+        searchProgressBar.visibility = View.VISIBLE
+
     }
 
     /**
@@ -248,6 +307,8 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         const val SEARCH_STRING = "SEARCH_STRING"
+        const val SEARCH_DELAY = 1500L
+        const val TRACK_CLICK_DELAY = 1500L
         const val PLACEHOLDER_VISIBILITY = "PLACEHOLDER_VISIBILITY"
         const val PLACEHOLDER_MSG = "PLACEHOLDER_MSG"
         const val PLACEHOLDER_IMG = "PLACEHOLDER_IMG"

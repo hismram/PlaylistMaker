@@ -1,6 +1,9 @@
 package com.example.playlismaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,17 +12,31 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerActivity() : ComponentActivity() {
     private var track: Track? = null
     private var isFavorite: Boolean = false
     private var inPlaylist: Boolean = false
-    private var isPlaying: Boolean = false
+    private var playerState: Int = STATE_DEFAULT
+    private val mediaPlayer = MediaPlayer()
+    private val handler = Handler(Looper.getMainLooper())
+    private val playbackTimerUpdate = object : Runnable {
+        override fun run() {
+            updateTimerText(SimpleDateFormat("mm:ss", Locale.getDefault())
+                .format(mediaPlayer.currentPosition))
+            if (playerState == STATE_PLAYING)
+                handler.postDelayed(this, TIMER_UPDATE_DELAY)
+        }
+    }
 
     private lateinit var backBtn: ImageButton
     private lateinit var queueBtn: ImageButton
     private lateinit var playBtn: ImageButton
     private lateinit var favoriteBtn: ImageButton
+
+    private lateinit var timer: TextView
 
     private lateinit var durationLabel: TextView
     private lateinit var albumLabel: TextView
@@ -49,6 +66,19 @@ class PlayerActivity() : ComponentActivity() {
         initComponents()
         initTrackData()
         initHandlers()
+        initMediaPlayer()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+        changePlayBtn()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(playbackTimerUpdate)
+        mediaPlayer.release()
     }
 
     /**
@@ -59,6 +89,8 @@ class PlayerActivity() : ComponentActivity() {
         queueBtn = findViewById(R.id.queue)
         playBtn = findViewById(R.id.play)
         favoriteBtn = findViewById(R.id.favorite)
+
+        timer = findViewById(R.id.timer)
 
         durationLabel = findViewById(R.id.duration_label)
         albumLabel = findViewById(R.id.album_label)
@@ -127,8 +159,70 @@ class PlayerActivity() : ComponentActivity() {
     fun initHandlers() {
         backBtn.setOnClickListener { finish() }
         queueBtn.setOnClickListener { addToPlaylist() }
-        playBtn.setOnClickListener { togglePlay() }
+        playBtn.setOnClickListener {
+            playbackControl()
+            changePlayBtn()
+        }
         favoriteBtn.setOnClickListener {  toggleFavorite() }
+    }
+
+    /**
+     * Инициализация плеера
+     */
+    fun initMediaPlayer() {
+        val mediaUrl = track?.previewUrl
+
+        if (mediaUrl != null) {
+            mediaPlayer.setDataSource(mediaUrl)
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnPreparedListener {
+                playBtn.isEnabled = true
+                playerState = STATE_PREPARED
+            }
+
+            mediaPlayer.setOnCompletionListener {
+                playerState = STATE_PREPARED
+                handler.removeCallbacks(playbackTimerUpdate)
+                updateTimerText(TIMER_ZERO)
+                changePlayBtn()
+            }
+        }
+    }
+
+    /**
+     * Вспомогательная функция обновления текста таймера
+     * @param text Ноовое значение
+     */
+    private fun updateTimerText(text: String) {
+        timer.text = text
+    }
+
+    /**
+     * Управление воспроизседением
+     */
+    private fun playbackControl() {
+        when (playerState) {
+            STATE_PLAYING -> pausePlayer()
+            STATE_PREPARED, STATE_PAUSED -> startPlayer()
+        }
+    }
+
+    /**
+     * Запускает воспроизведение и устанавливает соответствующий статус
+     */
+    private fun startPlayer() {
+        mediaPlayer.start()
+        handler.post(playbackTimerUpdate)
+        playerState = STATE_PLAYING
+    }
+
+    /**
+     * Останавливает воспроизведение и устанавливает соответствующий статус
+     */
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        handler.removeCallbacks(playbackTimerUpdate)
+        playerState = STATE_PAUSED
     }
 
     /**
@@ -148,16 +242,14 @@ class PlayerActivity() : ComponentActivity() {
     /**
      * Переключатель воспроизведения
      */
-    private fun togglePlay() {
-        isPlaying = !isPlaying
-
-        val iconId = if (isPlaying) {
+    private fun changePlayBtn() {
+        val iconId = if (playerState == STATE_PLAYING) {
             R.drawable.pause_icon
         } else {
             R.drawable.play_icon
         }
 
-        playBtn.setImageDrawable(AppCompatResources.getDrawable(favoriteBtn.context, iconId))
+        playBtn.setImageDrawable(AppCompatResources.getDrawable(playBtn.context, iconId))
     }
 
     /**
@@ -177,5 +269,11 @@ class PlayerActivity() : ComponentActivity() {
 
     companion object {
         const val TRACK_DATA = "TRACK_DATA"
+        const val TIMER_UPDATE_DELAY = 500L
+        const val TIMER_ZERO = "00:00"
+        const val STATE_DEFAULT = 0
+        const val STATE_PREPARED = 1
+        const val STATE_PLAYING = 2
+        const val STATE_PAUSED = 3
     }
 }
