@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/base_background"
     tools:context=".SearchActivity">
         <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -78,6 +79,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center_vertical">
+                <ProgressBar
+                    android:id="@+id/search_progress_bar"
+                    style="@style/SearchProgressBar"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                />
                 <TextView
                     android:id="@+id/tracks_view_placeholder"
                     style="@style/ListPlaceholderMsg"

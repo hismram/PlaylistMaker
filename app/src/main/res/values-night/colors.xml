@@ -3,6 +3,8 @@
     <color name="base_background">@color/yp_black</color>
     <color name="main_menu_background">@color/yp_black</color>
 
+    <color name="progress_bar">@color/yp_blue</color>
+
     <color name="switch_thumb">@color/yp_text_gray</color>
     <color name="switch_track">@color/yp_light_gray</color>
 
