@@ -28,8 +28,7 @@
             android:layout_height="match_parent"
             android:text="@string/dark_theme"
             android:textSize="@dimen/text_size_m"
-            app:thumbTint="@color/switch_thumb"
-            app:trackTint="@color/switch_track"
+            style="@style/Switcher"
         />
         <TextView
             style="@style/SettingsRow"
