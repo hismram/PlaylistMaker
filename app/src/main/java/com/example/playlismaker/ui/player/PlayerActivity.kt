@@ -1,4 +1,4 @@
-package com.example.playlismaker
+package com.example.playlismaker.ui.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -12,10 +12,13 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlismaker.Helpers
+import com.example.playlismaker.R
+import com.example.playlismaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerActivity() : ComponentActivity() {
+class PlayerActivity : ComponentActivity() {
     private var track: Track? = null
     private var isFavorite: Boolean = false
     private var inPlaylist: Boolean = false
@@ -156,7 +159,7 @@ class PlayerActivity() : ComponentActivity() {
     /**
      * Инициализация обработчиков
      */
-    fun initHandlers() {
+    private fun initHandlers() {
         backBtn.setOnClickListener { finish() }
         queueBtn.setOnClickListener { addToPlaylist() }
         playBtn.setOnClickListener {
@@ -169,7 +172,7 @@ class PlayerActivity() : ComponentActivity() {
     /**
      * Инициализация плеера
      */
-    fun initMediaPlayer() {
+    private fun initMediaPlayer() {
         val mediaUrl = track?.previewUrl
 
         if (mediaUrl != null) {

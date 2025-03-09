@@ -3,16 +3,19 @@ package com.example.playlismaker
 import android.app.Application
 import android.app.UiModeManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlismaker.domain.api.SettingsInteractor
 
 class App: Application() {
     var darkTheme = false
-    private lateinit var sharedPref: SharedPreferences
+    private lateinit var settingsInteractor: SettingsInteractor
     override fun onCreate() {
-        sharedPref = getSharedPreferences(PREFERENCES_STORAGE_ID, MODE_PRIVATE)
-        val mode = sharedPref.getInt(DARK_THEME, AppCompatDelegate.MODE_NIGHT_NO)
+        settingsInteractor = Creator.provideSettingsInteractor(
+            getSharedPreferences(PREFERENCES_STORAGE_ID, MODE_PRIVATE)
+        )
+
+        val mode =  settingsInteractor.getDarkMode() ?: AppCompatDelegate.MODE_NIGHT_NO
 
         darkTheme = mode == AppCompatDelegate.MODE_NIGHT_YES
 
@@ -29,10 +32,10 @@ class App: Application() {
 
         changeNightMode(nightMode)
 
-        sharedPref.edit().putInt(DARK_THEME, nightMode).apply()
+        settingsInteractor.setDarkMode(nightMode)
     }
 
-    fun changeNightMode(mode: Int) {
+    private fun changeNightMode(mode: Int) {
         val uiModeManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -44,6 +47,5 @@ class App: Application() {
 
     companion object {
         const val PREFERENCES_STORAGE_ID = "playlistmaker_storage"
-        const val DARK_THEME = "dark_theme"
     }
 }

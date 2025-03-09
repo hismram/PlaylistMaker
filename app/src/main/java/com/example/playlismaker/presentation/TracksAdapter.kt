@@ -1,8 +1,10 @@
-package com.example.playlismaker
+package com.example.playlismaker.presentation
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlismaker.R
+import com.example.playlismaker.domain.models.Track
 
 class TracksAdapter(private val tracks: ArrayList<Track>, val clickHandler: (Track) -> Unit):
     RecyclerView.Adapter<TracksViewHolder>() {

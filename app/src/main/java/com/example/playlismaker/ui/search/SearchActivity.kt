@@ -1,4 +1,4 @@
-package com.example.playlismaker
+package com.example.playlismaker.ui.search
 
 import android.content.Context
 import android.content.Intent
@@ -17,21 +17,22 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlismaker.service.ITunesService
+import com.example.playlismaker.App
+import com.example.playlismaker.Creator
+import com.example.playlismaker.ui.player.PlayerActivity
+import com.example.playlismaker.R
+import com.example.playlismaker.domain.models.Track
+import com.example.playlismaker.domain.api.TracksInteractor
+import com.example.playlismaker.presentation.TracksAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 
 class SearchActivity : AppCompatActivity() {
-    private var searchString: String = SEARCH_DEF
-
-    // Сервис ITunes
-    private val service = ITunesService()
-
+    private var searchString: String = SEARCH_DEFAULT
     private var placeholderImg: Int = R.drawable.not_found
-    // Список треков
     private val tracksList: ArrayList<Track> = ArrayList()
+    private lateinit var tracksProvider: TracksInteractor
     private lateinit var tracksAdapter: TracksAdapter
-    private lateinit var historyController: SearchHistory
     private lateinit var toolbar: MaterialToolbar
     private lateinit var searchHistoryHeader:TextView
     private lateinit var searchHistoryClear:MaterialButton
@@ -41,6 +42,33 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var tracksView: RecyclerView
     private lateinit var tracksPlaceholder: TextView
     private lateinit var tracksPlaceholderReload: MaterialButton
+    private val searchConsumer = object : TracksInteractor.TracksConsumer {
+        override fun consume(tracks: List<Track>) {
+            tracksList.clear()
+            tracksList.addAll(tracks)
+            handler.post {
+                if (tracks.isNotEmpty()) {
+                    showList()
+                    tracksAdapter.notifyDataSetChanged()
+                } else {
+                    showPlaceholder(
+                        R.string.not_found,
+                        R.drawable.not_found
+                    )
+                }
+            }
+        }
+
+        override fun error() {
+            handler.post {
+                showPlaceholder(
+                    R.string.network_error,
+                    R.drawable.network_error
+                )
+            }
+        }
+
+    }
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var trackClickAllowed = true
@@ -49,7 +77,10 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        historyController = SearchHistory(getSharedPreferences(App.PREFERENCES_STORAGE_ID, MODE_PRIVATE))
+        tracksProvider = Creator.provideTracksInteractor(
+            SEARCH_HISTORY_ID,
+            getSharedPreferences(App.PREFERENCES_STORAGE_ID, MODE_PRIVATE)
+        )
         tracksAdapter = TracksAdapter(tracksList) {
             if (trackClickAllowed()) openPlayer(it)
         }
@@ -66,7 +97,7 @@ class SearchActivity : AppCompatActivity() {
         tracksView.adapter = tracksAdapter
 
         searchHistoryClear.setOnClickListener {
-            historyController.clear()
+            tracksProvider.clearHistory()
             tracksList.clear()
             hideHistory()
         }
@@ -108,7 +139,6 @@ class SearchActivity : AppCompatActivity() {
         tracksPlaceholderReload.setOnClickListener { search() }
         searchCross.setOnClickListener { resetSearch() }
         toolbar.setOnClickListener { finish() }
-
         searchInput.requestFocus()
     }
 
@@ -119,12 +149,12 @@ class SearchActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
 
         // Сохраняем состояние
+        outState.putInt(LIST_VISIBILITY, tracksView.visibility)
         outState.putString(SEARCH_STRING, searchString)
         outState.putInt(PLACEHOLDER_VISIBILITY, tracksPlaceholder.visibility)
         outState.putString(PLACEHOLDER_MSG, tracksPlaceholder.text.toString())
         outState.putInt(PLACEHOLDER_IMG, placeholderImg)
         outState.putInt(PLACEHOLDER_BTN_VISIBILITY, tracksPlaceholderReload.visibility)
-        outState.putInt(LIST_VISIBILITY, tracksView.visibility)
     }
 
     /**
@@ -141,7 +171,7 @@ class SearchActivity : AppCompatActivity() {
         val placeholderImg = savedInstanceState.getInt(PLACEHOLDER_IMG)
         val placeholderBtnVisibility = savedInstanceState.getInt(PLACEHOLDER_BTN_VISIBILITY)
 
-        searchString = savedInstanceState.getString(SEARCH_STRING, SEARCH_DEF)
+        searchString = savedInstanceState.getString(SEARCH_STRING, SEARCH_DEFAULT)
         searchInput.setText(searchString)
         tracksView.visibility = listVisibility
         tracksPlaceholder.visibility = placeholderVisibility
@@ -172,7 +202,8 @@ class SearchActivity : AppCompatActivity() {
      * @param track Данные трека для плеера
      */
     private fun openPlayer(track: Track) {
-        historyController.add(track)
+        tracksProvider.addToHistory(track)
+        //historyController.add(track)
         val intent = Intent(this, PlayerActivity::class.java)
 
         intent.putExtra(PlayerActivity.TRACK_DATA, track.toJSON())
@@ -192,42 +223,22 @@ class SearchActivity : AppCompatActivity() {
      * Запускает поиск, заполняеет список треков результом или показывает заглушку
      */
     private fun search() {
-        val context = searchInput.context
+        //val context = searchInput.context
 
         if (searchInput.text.isNotEmpty()) {
             showSearchProgressBar()
-            service.search(searchInput.text.toString(), {
-                if (it?.isNotEmpty() == true) {
-                    showList()
-                    tracksList.clear()
-                    tracksList.addAll(it)
-                    tracksAdapter.notifyDataSetChanged()
-                } else {
-                    showPlaceholder(
-                        context.getString(R.string.not_found),
-                        R.drawable.not_found,
-                        false
-                    )
-                }
-            }, {
-                showPlaceholder(
-                    context.getString(R.string.network_error),
-                    R.drawable.network_error,
-                    true
-                )
-            })
+            tracksProvider.search(searchInput.text.toString(), searchConsumer)
         }
     }
 
     /**
      * Показывает заглушку, скрывает реестр
      *
-     * @param msg Текст сообщения в заглушке
+     * @param messageId Текст сообщения в заглушке
      * @param imgId Идентификатор картинки заглушки
-     * @param reload Флаг показа кнопки перезагрузки
      */
-    private fun showPlaceholder(msg: String, imgId: Int, reload: Boolean) {
-        tracksPlaceholder.text = msg
+    private fun showPlaceholder(messageId: Int, imgId: Int) {
+        tracksPlaceholder.text = tracksPlaceholder.context.getString(messageId)
 
         placeholderImg = imgId
         tracksPlaceholder.setCompoundDrawablesWithIntrinsicBounds(
@@ -240,7 +251,7 @@ class SearchActivity : AppCompatActivity() {
         searchProgressBar.visibility = View.GONE
         tracksView.visibility = View.GONE
         tracksPlaceholder.visibility = View.VISIBLE
-        tracksPlaceholderReload.isVisible = reload
+        tracksPlaceholderReload.isVisible = false
     }
 
     /**
@@ -248,12 +259,20 @@ class SearchActivity : AppCompatActivity() {
      */
     private fun showHistory() {
         tracksList.clear()
-        tracksList.addAll(historyController.getList())
+        tracksProvider.getHistory(object : TracksInteractor.TracksConsumer {
+            override fun consume(tracks: List<Track>) {
+                tracksList.addAll(tracks)
 
-        searchHistoryHeader.isVisible = tracksList.isNotEmpty()
-        searchHistoryClear.isVisible = tracksList.isNotEmpty()
+                handler.post {
+                    searchHistoryHeader.isVisible = tracksList.isNotEmpty()
+                    searchHistoryClear.isVisible = tracksList.isNotEmpty()
 
-        tracksAdapter.notifyDataSetChanged()
+                    tracksAdapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun error() {}
+        })
     }
 
     /**
@@ -298,14 +317,23 @@ class SearchActivity : AppCompatActivity() {
         if (view != null) {
             inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
         }
-        searchInput.setText(SEARCH_DEF)
+        searchInput.setText(SEARCH_DEFAULT)
         tracksList.clear()
-        tracksList.addAll(historyController.getList())
-        tracksAdapter.notifyDataSetChanged()
-        showList()
+        tracksProvider.getHistory(object : TracksInteractor.TracksConsumer {
+            override fun consume(tracks: List<Track>) {
+                tracksList.addAll(tracks)
+                handler.post {
+                    tracksAdapter.notifyDataSetChanged()
+                    showList()
+                }
+            }
+
+            override fun error() {}
+        })
     }
 
     companion object {
+        const val SEARCH_HISTORY_ID = "search_history"
         const val SEARCH_STRING = "SEARCH_STRING"
         const val SEARCH_DELAY = 1500L
         const val TRACK_CLICK_DELAY = 1500L
@@ -314,6 +342,6 @@ class SearchActivity : AppCompatActivity() {
         const val PLACEHOLDER_IMG = "PLACEHOLDER_IMG"
         const val PLACEHOLDER_BTN_VISIBILITY = "PLACEHOLDER_BTN_VISIBILITY"
         const val LIST_VISIBILITY = "LIST_VISIBILITY"
-        const val SEARCH_DEF = ""
+        const val SEARCH_DEFAULT = ""
     }
 }
