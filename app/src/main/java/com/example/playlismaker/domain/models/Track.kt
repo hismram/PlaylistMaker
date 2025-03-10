@@ -1,10 +1,9 @@
-package com.example.playlismaker
+package com.example.playlismaker.domain.models
 
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 data class Track(
     val trackId: Int,

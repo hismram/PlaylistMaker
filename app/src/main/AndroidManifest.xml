@@ -14,13 +14,13 @@
         android:theme="@style/Theme.PlaylisMaker"
         tools:targetApi="31">
         <activity
-            android:name=".SearchActivity"
+            android:name=".ui.search.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".MediaLibrary"
+            android:name=".ui.library.MediaLibrary"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,11 +29,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/settings" />
         <activity
-            android:name=".PlayerActivity"
+            android:name=".ui.player.PlayerActivity"
             android:exported="false" />
     </application>
 

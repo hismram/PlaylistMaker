@@ -1,8 +1,12 @@
-package com.example.playlismaker
+package com.example.playlismaker.ui.main
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import com.example.playlismaker.ui.library.MediaLibrary
+import com.example.playlismaker.R
+import com.example.playlismaker.ui.search.SearchActivity
+import com.example.playlismaker.ui.settings.SettingsActivity
 import com.google.android.material.button.MaterialButton
 
 class MainActivity : ComponentActivity() {

@@ -1,4 +1,4 @@
-package com.example.playlismaker
+package com.example.playlismaker.presentation
 
 import android.view.View
 import android.widget.ImageView
@@ -7,6 +7,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlismaker.Helpers
+import com.example.playlismaker.R
+import com.example.playlismaker.domain.models.Track
 
 class TracksViewHolder(trackView: View): RecyclerView.ViewHolder(trackView) {
     private val trackCover: ImageView = trackView.findViewById(R.id.track_cover)
@@ -21,10 +24,10 @@ class TracksViewHolder(trackView: View): RecyclerView.ViewHolder(trackView) {
             .load(model.artworkUrl100)
             .placeholder(R.drawable.cover_placeholder)
             .transform(RoundedCorners(
-                    Helpers.dpToPx(
-                        context.resources.getFloat(R.dimen.track_cover_corner_radius),
-                        context
-                    )
+                Helpers.dpToPx(
+                    context.resources.getFloat(R.dimen.track_cover_corner_radius),
+                    context
+                )
                 )
             )
             .into(trackCover)
