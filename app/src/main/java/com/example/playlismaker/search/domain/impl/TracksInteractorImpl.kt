@@ -13,7 +13,7 @@ class TracksInteractorImpl(private val tracksRepository: TracksRepository) : Tra
         executor.execute {
             try {
                 consumer.consume(tracksRepository.search(expression))
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 consumer.error()
             }
         }

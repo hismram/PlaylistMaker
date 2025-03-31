@@ -21,10 +21,10 @@ class PlayerViewModel(
 ): ViewModel() {
     private var trackLiveData = MutableLiveData<Track>(null)
     private var timerLiveData = MutableLiveData(TIMER_ZERO)
-    private var favoriteLiveData = MutableLiveData(false);
-    private var inLibraryLiveData = MutableLiveData(false);
+    private var favoriteLiveData = MutableLiveData(false)
+    private var inLibraryLiveData = MutableLiveData(false)
     private var playbackLiveData = MutableLiveData<Int>(PLAYER_STATE_DEFAULT)
-    private var mediaPlayer: MediaPlayer? = null;
+    private var mediaPlayer: MediaPlayer? = null
 
     // Обновление таймера во время воспроизведения
     private val playbackTimerUpdate = object : Runnable {

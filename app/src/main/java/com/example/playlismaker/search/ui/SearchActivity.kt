@@ -13,19 +13,18 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.example.playlismaker.R
 import com.example.playlismaker.databinding.ActivitySearchBinding
-import com.example.playlismaker.search.domain.api.TracksInteractor
 import com.example.playlismaker.search.domain.model.Track
 import com.example.playlismaker.search.presentation.SearchAdapter
 import com.example.playlismaker.player.ui.PlayerActivity
 import com.example.playlismaker.search.presentation.SearchViewModel
 
 class SearchActivity : ComponentActivity() {
-    private lateinit var binding: ActivitySearchBinding;
+    private lateinit var binding: ActivitySearchBinding
     private var searchString: String = SEARCH_DEFAULT
     private var placeholderImg: Int = R.drawable.not_found
     private val tracksList: ArrayList<Track> = ArrayList()
     private lateinit var searchAdapter: SearchAdapter
-    private lateinit var viewModel: SearchViewModel;
+    private lateinit var viewModel: SearchViewModel
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var trackClickAllowed = true

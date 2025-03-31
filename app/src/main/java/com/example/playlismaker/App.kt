@@ -2,7 +2,6 @@ package com.example.playlismaker
 
 import android.app.Application
 import android.app.UiModeManager
-import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlismaker.creator.Creator
@@ -36,7 +35,7 @@ class App: Application() {
     }
 
     private fun changeNightMode(mode: Int) {
-        val uiModeManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+        val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             uiModeManager.setApplicationNightMode(mode)

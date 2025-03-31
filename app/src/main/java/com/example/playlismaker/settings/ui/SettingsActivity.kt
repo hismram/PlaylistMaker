@@ -7,8 +7,8 @@ import com.example.playlismaker.databinding.ActivitySettingsBinding
 import com.example.playlismaker.settings.presentation.SettingsViewModel
 
 class SettingsActivity : ComponentActivity() {
-    private lateinit var viewModel: SettingsViewModel;
-    private lateinit var binding: ActivitySettingsBinding;
+    private lateinit var viewModel: SettingsViewModel
+    private lateinit var binding: ActivitySettingsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -14,7 +14,7 @@ class SettingsRepositoryImpl(
     }
 
     override fun getDarkMode(): Boolean {
-        var mode = false;
+        var mode = false
 
         try {
             val result = preferencesClient.doRequest(GetBooleanValueRequest(DARK_MODE_ID))

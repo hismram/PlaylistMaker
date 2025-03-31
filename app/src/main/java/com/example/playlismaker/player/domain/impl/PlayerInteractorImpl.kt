@@ -6,10 +6,6 @@ import com.example.playlismaker.search.domain.api.TracksRepository
 class PlayerInteractorImpl(
     val tracksRepository: TracksRepository
 ) : PlayerInteractor {
-    override fun loadSomeData(): Boolean {
-        TODO("Not yet implemented")
-        return true
-    }
 
     override fun loadTrackData(
         trackId: Int,

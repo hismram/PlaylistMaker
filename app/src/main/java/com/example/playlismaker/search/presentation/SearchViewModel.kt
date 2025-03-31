@@ -13,8 +13,8 @@ import com.example.playlismaker.search.domain.api.TracksInteractor
 import com.example.playlismaker.search.domain.model.Track
 
 class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
-    private var searchString: String = "";
-    private val trackListLiveData = MutableLiveData<List<Track>>(null);
+    private var searchString: String = ""
+    private val trackListLiveData = MutableLiveData<List<Track>>(null)
     private val searchStateLiveData = MutableLiveData<Int>(STATE_LIST)
 
     init {
