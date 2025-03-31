@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/base_background"
-    tools:context=".ui.search.SearchActivity">
+    tools:context=".search.ui.SearchActivity">
         <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
             android:gravity="center_vertical">
                 <ProgressBar
                     android:id="@+id/search_progress_bar"
-                    style="@style/SearchProgressBar"
+                    style="@style/ProgressBar"
                     android:layout_gravity="center"
                     android:visibility="gone"
                 />

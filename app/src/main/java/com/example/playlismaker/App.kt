@@ -5,19 +5,21 @@ import android.app.UiModeManager
 import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlismaker.domain.api.SettingsInteractor
+import com.example.playlismaker.creator.Creator
+import com.example.playlismaker.settings.domain.api.SettingsInteractor as SettingsInteractor
 
 class App: Application() {
     var darkTheme = false
     private lateinit var settingsInteractor: SettingsInteractor
     override fun onCreate() {
-        settingsInteractor = Creator.provideSettingsInteractor(
-            getSharedPreferences(PREFERENCES_STORAGE_ID, MODE_PRIVATE)
-        )
+        settingsInteractor = Creator.provideSettingsInteractor(this)
+        darkTheme = settingsInteractor.getDarkMode()
 
-        val mode =  settingsInteractor.getDarkMode() ?: AppCompatDelegate.MODE_NIGHT_NO
-
-        darkTheme = mode == AppCompatDelegate.MODE_NIGHT_YES
+        var mode = if (darkTheme) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
 
         changeNightMode(mode)
 
@@ -31,8 +33,6 @@ class App: Application() {
             else AppCompatDelegate.MODE_NIGHT_NO
 
         changeNightMode(nightMode)
-
-        settingsInteractor.setDarkMode(nightMode)
     }
 
     private fun changeNightMode(mode: Int) {
@@ -47,5 +47,6 @@ class App: Application() {
 
     companion object {
         const val PREFERENCES_STORAGE_ID = "playlistmaker_storage"
+        const val SEARCH_HISTORY_STORAGE_ID = "search_history"
     }
 }
