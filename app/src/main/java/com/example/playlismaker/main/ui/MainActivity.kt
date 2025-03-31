@@ -1,9 +1,9 @@
 package com.example.playlismaker.main.ui
 
 import android.content.Intent
-import com.example.playlismaker.search.ui.SearchActivity as SearchActivity
-import com.example.playlismaker.library.ui.Activity as LibraryActivity
-import com.example.playlismaker.settings.ui.SettingsActivity as SettingsActivity
+import com.example.playlismaker.search.ui.SearchActivity
+import com.example.playlismaker.library.ui.LibraryActivity
+import com.example.playlismaker.settings.ui.SettingsActivity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.playlismaker.R

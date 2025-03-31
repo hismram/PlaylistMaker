@@ -3,10 +3,10 @@ package com.example.playlismaker.creator
 import android.app.Application
 import android.content.SharedPreferences
 import com.example.playlismaker.App
-import com.example.playlismaker.settings.data.SettingsRepositoryImpl as SettingsRepositoryImpl
-import com.example.playlismaker.search.data.TracksRepositoryImpl as TracksRepositoryImpl
-import com.example.playlismaker.settings.domain.impl.SettingsInteractorImpl as SettingsInteractorImpl
-import com.example.playlismaker.search.domain.impl.TracksInteractorImpl as TracksInteractorImpl
+import com.example.playlismaker.settings.data.SettingsRepositoryImpl
+import com.example.playlismaker.search.data.TracksRepositoryImpl
+import com.example.playlismaker.settings.domain.impl.SettingsInteractorImpl
+import com.example.playlismaker.search.domain.impl.TracksInteractorImpl
 import com.example.playlismaker.data.local.SharedPreferencesClient
 import com.example.playlismaker.data.network.RetrofitNetworkClient
 import com.example.playlismaker.player.domain.api.PlayerInteractor

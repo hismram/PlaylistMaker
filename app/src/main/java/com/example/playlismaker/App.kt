@@ -6,7 +6,7 @@ import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlismaker.creator.Creator
-import com.example.playlismaker.settings.domain.api.SettingsInteractor as SettingsInteractor
+import com.example.playlismaker.settings.domain.api.SettingsInteractor
 
 class App: Application() {
     var darkTheme = false
