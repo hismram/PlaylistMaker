@@ -40,5 +40,4 @@ class ExternalNavigatorImpl(val application: App): ExternalNavigator {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         application.startActivity(intent)
     }
-
 }
