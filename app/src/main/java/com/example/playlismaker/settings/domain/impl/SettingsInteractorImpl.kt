@@ -13,7 +13,7 @@ class SettingsInteractorImpl(
         application.switchTheme(value)
     }
 
-    override fun getDarkMode(): Boolean {
+    override fun getDarkMode(): Boolean? {
         return settingsRepository.getDarkMode()
     }
 }

@@ -11,6 +11,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlismaker.App
 import com.example.playlismaker.creator.Creator
 import com.example.playlismaker.player.domain.api.PlayerInteractor
+import com.example.playlismaker.player.domain.model.PlaybackState
+import com.example.playlismaker.player.domain.model.PlayerState
+import com.example.playlismaker.player.domain.model.TrackData
 import com.example.playlismaker.search.domain.model.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -19,21 +22,18 @@ class PlayerViewModel(
     trackId: Int,
     playerInteractor: PlayerInteractor
 ): ViewModel() {
-    private var trackLiveData = MutableLiveData<Track>(null)
-    private var timerLiveData = MutableLiveData(TIMER_ZERO)
-    private var favoriteLiveData = MutableLiveData(false)
-    private var inLibraryLiveData = MutableLiveData(false)
-    private var playbackLiveData = MutableLiveData<Int>(PLAYER_STATE_DEFAULT)
+    private lateinit var playerState: PlayerState;
+    private var playerStateLiveData = MutableLiveData<PlayerState>(null)
     private var mediaPlayer: MediaPlayer? = null
 
     // Обновление таймера во время воспроизведения
     private val playbackTimerUpdate = object : Runnable {
         override fun run() {
-            while (playbackLiveData.value == PLAYER_STATE_PLAYNG) {
-                timerLiveData.postValue(
-                    SimpleDateFormat("mm:ss", Locale.getDefault())
-                        .format(mediaPlayer?.currentPosition)
-                )
+            while (playerState.playbackState == PlaybackState.PLAYING) {
+                playerState.timer = SimpleDateFormat("mm:ss", Locale.getDefault())
+                    .format(mediaPlayer?.currentPosition)
+
+                playerStateLiveData.postValue(playerState)
                 Thread.sleep(TIMER_UPDATE_DELAY)
             }
         }
@@ -49,8 +49,24 @@ class PlayerViewModel(
                     track: Track
                 ) {
                     mediaPlayer = initMediaPlayer(track.previewUrl) {
-                        trackLiveData.postValue(track)
-                        playbackLiveData.postValue(PLAYER_STATE_PREPARED)
+                        playerState = PlayerState(
+                            favorite = false,
+                            inLibrary = false,
+                            playbackState = PlaybackState.PREPARED,
+                            timer = TIMER_ZERO,
+                            trackData = TrackData(
+                                name = track.trackName,
+                                artist = track.artistName,
+                                album = track.collectionName,
+                                genre = track.primaryGenreName,
+                                year = track.getReleaseDate(),
+                                country = track.country,
+                                cover = track.getLargeArtwork(),
+                                duraration = track.getTrackTime()
+                            )
+                        )
+
+                        playerStateLiveData.postValue(playerState)
                     }
                 }
 
@@ -68,7 +84,9 @@ class PlayerViewModel(
                 mediaPlayer.prepareAsync()
                 mediaPlayer.setOnPreparedListener{ onPrepared() }
                 mediaPlayer.setOnCompletionListener {
-                    playbackLiveData.value = PLAYER_STATE_PAUSED
+                    playerState.playbackState = PlaybackState.PAUSED
+                    playerState.timer = TIMER_ZERO
+                    playerStateLiveData.postValue(playerState)
                 }
             } catch(e: Exception) {
                 e.printStackTrace()
@@ -82,25 +100,24 @@ class PlayerViewModel(
     private fun startPlayer() {
         mediaPlayer?.start()
         Thread(playbackTimerUpdate).start()
-        playbackLiveData.value = PLAYER_STATE_PLAYNG
+        playerState.playbackState = PlaybackState.PLAYING
+        playerStateLiveData.postValue(playerState)
     }
 
     // Остановка плеера
     private fun pausePlayer() {
         mediaPlayer?.pause()
-        playbackLiveData.value = PLAYER_STATE_PAUSED
+        playerState.playbackState = PlaybackState.PAUSED
+        playerStateLiveData.postValue(playerState)
     }
 
-    fun getTrackData(): LiveData<Track> = trackLiveData
-    fun getPlaybackLiveData(): LiveData<Int> = playbackLiveData
-    fun getTimerLiveData(): LiveData<String> = timerLiveData
-    fun getFavoriteLiveData(): LiveData<Boolean> = favoriteLiveData
-    fun getInLibraryLiveData(): LiveData<Boolean> = inLibraryLiveData
+    fun getPlayerStateLiveData(): LiveData<PlayerState> = playerStateLiveData
 
     // Переключение состояния плеера
     fun togglePlay() {
-        if (playbackLiveData.value == PLAYER_STATE_PAUSED ||
-            playbackLiveData.value == PLAYER_STATE_PREPARED) {
+        if (playerState.playbackState == PlaybackState.PAUSED ||
+            playerState.playbackState == PlaybackState.PREPARED
+        ) {
             startPlayer()
         } else {
             pausePlayer()
@@ -108,17 +125,20 @@ class PlayerViewModel(
     }
 
     fun toggleFavorite() {
-        favoriteLiveData.value = !(favoriteLiveData.value!!)
+        playerState.favorite = !(playerState.favorite)
+        playerStateLiveData.postValue(playerState)
     }
 
     fun toggleInLibrary() {
-        inLibraryLiveData.value = !(inLibraryLiveData.value!!)
+        playerState.inLibrary = playerState.inLibrary
+        playerStateLiveData.postValue(playerState)
     }
 
     // Освобождает плеер
     fun releaseMediaPlayer() {
         // Останавливем воспроизмедение что-бы избежать обращение к плееру в параллельном потоке
-        playbackLiveData.value = PLAYER_STATE_PAUSED
+        playerState.playbackState = PlaybackState.PAUSED
+        playerStateLiveData.postValue(playerState)
         mediaPlayer?.release()
     }
 
@@ -135,11 +155,7 @@ class PlayerViewModel(
             }
         }
 
-        const val PLAYER_STATE_DEFAULT = 0
-        const val PLAYER_STATE_PREPARED = 1
-        const val PLAYER_STATE_PLAYNG = 2
-        const val PLAYER_STATE_PAUSED = 3
         const val TIMER_UPDATE_DELAY = 500L
-        const val TIMER_ZERO = "0.00"
+        const val TIMER_ZERO = "00.00"
     }
 }

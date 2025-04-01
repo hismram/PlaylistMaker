@@ -47,8 +47,12 @@ class SharedPreferencesClient(private val sharedPref: SharedPreferences) : Prefe
     /**
      * Читает логическое значение
      */
-    private fun getBoolean(id: String): Boolean {
-        return sharedPref.getBoolean(id, false)
+    private fun getBoolean(id: String): Boolean? {
+        if (sharedPref.contains(id)) {
+            return sharedPref.getBoolean(id, false)
+        } else {
+            return null
+        }
     }
 
     /**

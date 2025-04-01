@@ -2,25 +2,22 @@ package com.example.playlismaker
 
 import android.app.Application
 import android.app.UiModeManager
+import android.content.res.Configuration
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlismaker.creator.Creator
 import com.example.playlismaker.settings.domain.api.SettingsInteractor
 
 class App: Application() {
-    var darkTheme = false
+    var darkTheme: Boolean = false
     private lateinit var settingsInteractor: SettingsInteractor
     override fun onCreate() {
         settingsInteractor = Creator.provideSettingsInteractor(this)
-        darkTheme = settingsInteractor.getDarkMode()
+        val darkThemeSetting = settingsInteractor.getDarkMode()
 
-        var mode = if (darkTheme) {
-            AppCompatDelegate.MODE_NIGHT_YES
-        } else {
-            AppCompatDelegate.MODE_NIGHT_NO
+        if (darkThemeSetting != null) {
+            switchTheme(darkThemeSetting)
         }
-
-        changeNightMode(mode)
 
         super.onCreate()
     }

@@ -16,6 +16,7 @@ import com.example.playlismaker.databinding.ActivitySearchBinding
 import com.example.playlismaker.search.domain.model.Track
 import com.example.playlismaker.search.presentation.SearchAdapter
 import com.example.playlismaker.player.ui.PlayerActivity
+import com.example.playlismaker.search.domain.model.ListState
 import com.example.playlismaker.search.presentation.SearchViewModel
 
 class SearchActivity : ComponentActivity() {
@@ -39,25 +40,17 @@ class SearchActivity : ComponentActivity() {
             this, SearchViewModel.getViewModelFactory()
         )[SearchViewModel::class.java]
 
-        viewModel.getTrackListLiveData().observe(this) { tracks ->
-            if (tracks != null) {
-                tracksList.clear()
-                tracksList.addAll(tracks)
-                searchAdapter.notifyDataSetChanged()
-            }
-        }
         viewModel.getSearchStateLiveData().observe(this) { state ->
             when (state) {
-                SearchViewModel.STATE_EMPTY -> showPlaceholder(
-                    R.string.not_found, R.drawable.not_found
-                )
-                SearchViewModel.STATE_LOADING -> showProgressBar()
-                SearchViewModel.STATE_NETWORK_ERROR -> showPlaceholder(
+                ListState.Error -> showPlaceholder(
                     R.string.network_error, R.drawable.network_error
                 )
-                SearchViewModel.STATE_LIST -> showList()
+                is ListState.Loaded -> showList(state.tracks)
+                ListState.Loading -> showProgressBar()
+                ListState.NotFound -> showPlaceholder(R.string.not_found, R.drawable.not_found)
             }
         }
+
         searchAdapter = SearchAdapter(tracksList) {
             if (trackClickAllowed()) openPlayer(it)
         }
@@ -183,7 +176,11 @@ class SearchActivity : ComponentActivity() {
     /**
      * Скрывает заглушку, показывает реестр
      */
-    private fun showList() {
+    private fun showList(tracks: List<Track>) {
+        tracksList.clear()
+        tracksList.addAll(tracks)
+        searchAdapter.notifyDataSetChanged()
+
         binding.tracksViewPlaceholder.isVisible = false
         binding.tracksViewPlaceholderReload.isVisible = false
         binding.searchProgressBar.isVisible = false

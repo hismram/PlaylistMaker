@@ -10,8 +10,9 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlismaker.Helpers
 import com.example.playlismaker.R
 import com.example.playlismaker.databinding.ActivityPlayerBinding
+import com.example.playlismaker.player.domain.model.PlaybackState
+import com.example.playlismaker.player.domain.model.TrackData
 import com.example.playlismaker.player.presentation.PlayerViewModel
-import com.example.playlismaker.search.domain.model.Track
 
 class PlayerActivity : ComponentActivity() {
     private var trackId: Int = -1
@@ -37,42 +38,15 @@ class PlayerActivity : ComponentActivity() {
             )
         )[PlayerViewModel::class.java]
 
-        viewModel.getTrackData().observe(this) { trackData ->
-            if (trackData !== null) {
-                initTrackData(trackData)
+        viewModel.getPlayerStateLiveData().observe(this) { playerState ->
+            if (playerState != null) {
+                initTrackData(playerState.trackData)
                 initHandlers()
+                changePlaybackState(playerState.playbackState)
+                updateFavorite(playerState.favorite)
+                updateInLibrary(playerState.inLibrary)
+                binding.timer.text = playerState.timer
             }
-        }
-
-        viewModel.getPlaybackLiveData().observe(this) { state ->
-            changePlaybackState(state)
-        }
-        viewModel.getTimerLiveData().observe(this) { time ->
-            binding.timer.text = time
-        }
-        viewModel.getFavoriteLiveData().observe(this) { isFavorite ->
-            val icon = if (isFavorite) {
-                R.drawable.favorite_marked_icon
-            } else {
-                R.drawable.favorite_icon
-            }
-
-            binding.favorite.setImageDrawable(AppCompatResources.getDrawable(
-                binding.favorite.context,
-                icon
-            ))
-        }
-        viewModel.getInLibraryLiveData().observe(this) { inLibrary ->
-            val icon = if (inLibrary) {
-                R.drawable.queue_marked_icon
-            } else {
-                R.drawable.queue_icon
-            }
-
-            binding.queue.setImageDrawable(AppCompatResources.getDrawable(
-                binding.queue.context,
-                icon
-            ))
         }
 
         binding.menuButton.setOnClickListener { finish() }
@@ -83,8 +57,34 @@ class PlayerActivity : ComponentActivity() {
         viewModel.releaseMediaPlayer()
     }
 
-    private fun changePlaybackState(state: Int) {
-        val icon = if (state == PlayerViewModel.PLAYER_STATE_PLAYNG) {
+    private fun updateFavorite(isFavorite: Boolean) {
+        val icon = if (isFavorite) {
+            R.drawable.favorite_marked_icon
+        } else {
+            R.drawable.favorite_icon
+        }
+
+        binding.favorite.setImageDrawable(AppCompatResources.getDrawable(
+            binding.favorite.context,
+            icon
+        ))
+    }
+
+    private fun updateInLibrary(inLibrary: Boolean) {
+        val icon = if (inLibrary) {
+            R.drawable.queue_marked_icon
+        } else {
+            R.drawable.queue_icon
+        }
+
+        binding.queue.setImageDrawable(AppCompatResources.getDrawable(
+            binding.queue.context,
+            icon
+        ))
+    }
+
+    private fun changePlaybackState(state: PlaybackState) {
+        val icon = if (state == PlaybackState.PLAYING) {
             R.drawable.pause_icon
         } else {
             R.drawable.play_icon
@@ -95,11 +95,11 @@ class PlayerActivity : ComponentActivity() {
         )
     }
 
-    private fun initTrackData(track: Track) {
+    private fun initTrackData(trackData: TrackData) {
         val context  = binding.albumCover.context
 
         Glide.with(binding.albumCover)
-            .load(track.getLargeArtwork())
+            .load(trackData.cover)
             .placeholder(R.drawable.album_placeholder)
             .transform(
                 RoundedCorners(
@@ -118,29 +118,29 @@ class PlayerActivity : ComponentActivity() {
         binding.albumCover.isVisible = true
         binding.playControlsLayout.isVisible = true
 
-        binding.trackName.text = track.trackName
+        binding.trackName.text = trackData.name
         binding.trackName.isVisible = true
 
-        binding.trackArtist.text = track.artistName
+        binding.trackArtist.text = trackData.artist
         binding.trackArtist.isVisible = true
 
-        binding.trackDuration.text = track.getTrackTime()
+        binding.trackDuration.text = trackData.duraration
         binding.trackDuration.isVisible = binding.trackDuration.text.isNotEmpty()
         binding.durationLabel.isVisible = binding.trackDuration.text.isNotEmpty()
 
-        binding.trackAlbum.text = track.collectionName
+        binding.trackAlbum.text = trackData.album
         binding.trackAlbum.isVisible = binding.trackAlbum.text.isNotEmpty()
         binding.albumLabel.isVisible = binding.trackAlbum.text.isNotEmpty()
 
-        binding.trackYear.text = track.getReleaseDate()
+        binding.trackYear.text = trackData.year
         binding.trackYear.isVisible = binding.trackYear.text.isNotEmpty()
         binding.yearLabel.isVisible = binding.trackYear.text.isNotEmpty()
 
-        binding.trackGenre.text = track.primaryGenreName
+        binding.trackGenre.text = trackData.genre
         binding.trackGenre.isVisible = binding.trackGenre.text.isNotEmpty()
         binding.genreLabel.isVisible = binding.trackGenre.text.isNotEmpty()
 
-        binding.trackCountry.text = track.country
+        binding.trackCountry.text = trackData.country
         binding.trackCountry.isVisible = binding.trackGenre.text.isNotEmpty()
         binding.countryLabel.isVisible = binding.trackGenre.text.isNotEmpty()
     }
@@ -149,27 +149,15 @@ class PlayerActivity : ComponentActivity() {
      * Инициализация обработчиков
      */
     private fun initHandlers() {
-        binding.queue.setOnClickListener { addToPlaylist() }
+        binding.queue.setOnClickListener {
+            viewModel.toggleInLibrary()
+        }
         binding.play.setOnClickListener {
             viewModel.togglePlay()
         }
         binding.favorite.setOnClickListener {
-            toggleFavorite()
+            viewModel.toggleFavorite()
         }
-    }
-
-    /**
-     * Переключатель избранного трека
-     */
-    private fun toggleFavorite() {
-        viewModel.toggleFavorite()
-    }
-
-    /**
-     * Добавление в плейлист
-     */
-    private fun addToPlaylist() {
-        viewModel.toggleInLibrary()
     }
 
     companion object {
