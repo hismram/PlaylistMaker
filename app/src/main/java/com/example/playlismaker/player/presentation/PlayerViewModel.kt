@@ -22,7 +22,7 @@ class PlayerViewModel(
     trackId: Int,
     playerInteractor: PlayerInteractor
 ): ViewModel() {
-    private lateinit var playerState: PlayerState;
+    private lateinit var playerState: PlayerState
     private var playerStateLiveData = MutableLiveData<PlayerState>(null)
     private var mediaPlayer: MediaPlayer? = null
 

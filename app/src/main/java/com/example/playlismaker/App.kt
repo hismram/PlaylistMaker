@@ -2,7 +2,6 @@ package com.example.playlismaker
 
 import android.app.Application
 import android.app.UiModeManager
-import android.content.res.Configuration
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlismaker.creator.Creator

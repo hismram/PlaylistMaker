@@ -37,7 +37,7 @@ class SettingsViewModel(
     }
 
     fun changeTheme(bool: Boolean) {
-        if (darkThemeLiveData.value !== bool) {
+        if (darkThemeLiveData.value != bool) {
             settingsInteractor.setDarkMode(bool)
         }
     }
