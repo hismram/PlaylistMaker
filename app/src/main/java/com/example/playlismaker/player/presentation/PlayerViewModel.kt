@@ -125,7 +125,7 @@ class PlayerViewModel(
     }
 
     fun toggleFavorite() {
-        playerState.favorite = !(playerState.favorite)
+        playerState.favorite = !playerState.favorite
         playerStateLiveData.postValue(playerState)
     }
 
