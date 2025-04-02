@@ -130,7 +130,7 @@ class PlayerViewModel(
     }
 
     fun toggleInLibrary() {
-        playerState.inLibrary = playerState.inLibrary
+        playerState.inLibrary = !playerState.inLibrary
         playerStateLiveData.postValue(playerState)
     }
 
