@@ -10,6 +10,7 @@ import com.example.playlismaker.search.domain.impl.TracksInteractorImpl
 import com.example.playlismaker.data.local.SharedPreferencesClient
 import com.example.playlismaker.data.network.ITunesApi
 import com.example.playlismaker.data.network.RetrofitNetworkClient
+import com.example.playlismaker.player.data.PlayerRepositoryImpl
 import com.example.playlismaker.player.domain.api.PlayerInteractor
 import com.example.playlismaker.player.domain.impl.PlayerInteractorImpl
 import com.example.playlismaker.sharing.data.ExternalNavigatorImpl
@@ -36,6 +37,10 @@ object Creator {
 
     private fun getSettingsRepository(sharedPref: SharedPreferences): SettingsRepositoryImpl {
         return SettingsRepositoryImpl(SharedPreferencesClient(sharedPref))
+    }
+
+    private fun getPlayerRepository(): PlayerRepositoryImpl {
+        return PlayerRepositoryImpl()
     }
 
     fun provideTracksInteractor(
@@ -77,7 +82,8 @@ object Creator {
         )
 
         return PlayerInteractorImpl(
-            getTracksRepository(App.SEARCH_HISTORY_STORAGE_ID, sharedPreferences)
+            getTracksRepository(App.SEARCH_HISTORY_STORAGE_ID, sharedPreferences),
+            getPlayerRepository()
         )
     }
 
