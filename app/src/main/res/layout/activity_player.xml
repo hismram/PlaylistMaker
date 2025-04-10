@@ -16,6 +16,17 @@
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/arrow_back_icon" />
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/leftBorder"
         android:orientation="vertical"
@@ -40,6 +51,7 @@
     <ImageView
         android:id="@+id/album_cover"
         android:scaleType="centerCrop"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/offset_xl"
@@ -55,6 +67,7 @@
     <TextView
         android:id="@+id/track_name"
         style="@style/PlayerTrackMain"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/offset_l"
@@ -69,6 +82,7 @@
     <TextView
         android:id="@+id/track_artist"
         style="@style/PlayerTrackMain"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/track_name"
@@ -82,6 +96,7 @@
 
     <FrameLayout
         android:id="@+id/play_controls_layout"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/offset_3xl"
@@ -117,6 +132,7 @@
 
     <TextView
         android:id="@+id/timer"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/offset_4xs"
@@ -143,6 +159,7 @@
     <TextView
         android:id="@+id/duration_label"
         style="@style/PlayerTrackData.Label"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/timer"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintBottom_toTopOf="@id/album_label"
@@ -151,6 +168,7 @@
     <TextView
         android:id="@+id/track_duration"
         style="@style/PlayerTrackData.Data"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/timer"
         app:layout_constraintBottom_toTopOf="@id/track_album"
         app:layout_constraintStart_toStartOf="@id/labels_barrier"
@@ -162,6 +180,7 @@
         android:id="@+id/album_label"
         style="@style/PlayerTrackData.Label"
         android:layout_width="wrap_content"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/duration_label"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintBottom_toTopOf="@id/year_label"
@@ -170,6 +189,7 @@
     <TextView
         android:id="@+id/track_album"
         style="@style/PlayerTrackData.Data"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/track_year"
         app:layout_constraintStart_toStartOf="@id/labels_barrier"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
@@ -180,6 +200,7 @@
         android:id="@+id/year_label"
         style="@style/PlayerTrackData.Label"
         android:layout_width="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/genre_label"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintTag="label"
@@ -187,6 +208,7 @@
     <TextView
         android:id="@+id/track_year"
         style="@style/PlayerTrackData.Data"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/track_genre"
         app:layout_constraintStart_toStartOf="@id/labels_barrier"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
@@ -197,6 +219,7 @@
         android:id="@+id/genre_label"
         style="@style/PlayerTrackData.Label"
         android:layout_width="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/country_label"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
         app:layout_constraintTag="label"
@@ -204,6 +227,7 @@
     <TextView
         android:id="@+id/track_genre"
         style="@style/PlayerTrackData.Data"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/track_country"
         app:layout_constraintStart_toStartOf="@id/labels_barrier"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
@@ -213,6 +237,7 @@
     <TextView
         android:id="@+id/country_label"
         style="@style/PlayerTrackData.Label"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/bottomBorder"
         app:layout_constraintStart_toStartOf="@id/leftBorder"
@@ -221,6 +246,7 @@
     <TextView
         android:id="@+id/track_country"
         style="@style/PlayerTrackData.Data"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/bottomBorder"
         app:layout_constraintStart_toStartOf="@id/labels_barrier"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
