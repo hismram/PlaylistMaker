@@ -80,7 +80,7 @@ class PlayerActivity : ComponentActivity() {
     }
 
     private fun changePlaybackState(state: PlaybackState) {
-        val icon = if (state == PlaybackState.PLAYING) {
+        val icon = if (state is PlaybackState.Playing) {
             R.drawable.pause_icon
         } else {
             R.drawable.play_icon

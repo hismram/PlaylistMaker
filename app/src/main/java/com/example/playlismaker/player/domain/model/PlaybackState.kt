@@ -1,7 +1,7 @@
 package com.example.playlismaker.player.domain.model
 
-enum class PlaybackState {
-    PREPARED,
-    PLAYING,
-    PAUSED
+sealed class PlaybackState {
+    object Playing : PlaybackState()
+    object Paused : PlaybackState()
+    object Prepared : PlaybackState()
 }

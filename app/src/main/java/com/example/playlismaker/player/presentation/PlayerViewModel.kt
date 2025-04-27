@@ -3,30 +3,23 @@ package com.example.playlismaker.player.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlismaker.player.domain.api.PlayerInteractor
 import com.example.playlismaker.player.domain.model.PlaybackState
 import com.example.playlismaker.player.domain.model.PlayerState
 import com.example.playlismaker.player.domain.model.TrackData
 import com.example.playlismaker.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     trackId: Int,
-    val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor
 ): ViewModel() {
     private lateinit var playerState: PlayerState
     private var playerStateLiveData = MutableLiveData<PlayerState>(null)
-
-    // Обновление таймера во время воспроизведения
-    private val playbackTimerUpdate = object : Runnable {
-        override fun run() {
-            while (playerState.playbackState == PlaybackState.PLAYING) {
-                playerState.timer = playerInteractor.getPlaybackTimer()
-                playerStateLiveData.postValue(playerState)
-                Thread.sleep(TIMER_UPDATE_DELAY)
-            }
-        }
-    }
-
+    private var timerJob: Job? = null;
 
     init {
         // Получение данных трека и иницализация плеера
@@ -39,7 +32,7 @@ class PlayerViewModel(
                     playerState = PlayerState(
                         favorite = false,
                         inLibrary = false,
-                        playbackState = PlaybackState.PREPARED,
+                        playbackState = PlaybackState.Prepared,
                         timer = TIMER_ZERO,
                         trackData = TrackData(
                             name = track.trackName,
@@ -58,26 +51,43 @@ class PlayerViewModel(
 
                 override fun error() {}
             },
-            {
-                playerState.playbackState = PlaybackState.PAUSED
-                playerState.timer = TIMER_ZERO
+            onCompleteListener = { pausePlayer(true) }
+        )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        timerJob?.cancel();
+    }
+
+    private fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (playerState.playbackState is PlaybackState.Playing) {
+                delay(TIMER_UPDATE_DELAY)
+                playerState.timer = playerInteractor.getPlaybackTimer()
                 playerStateLiveData.postValue(playerState)
             }
-        )
+        }
     }
 
     // Запуск плеера
     private fun startPlayer() {
         playerInteractor.play()
-        Thread(playbackTimerUpdate).start()
-        playerState.playbackState = PlaybackState.PLAYING
+        playerState.playbackState = PlaybackState.Playing
         playerStateLiveData.postValue(playerState)
+        startTimer()
     }
 
     // Остановка плеера
-    private fun pausePlayer() {
+    private fun pausePlayer(resetTimer: Boolean = false) {
+        timerJob?.cancel()
         playerInteractor.pause()
-        playerState.playbackState = PlaybackState.PAUSED
+        playerState.playbackState = PlaybackState.Paused
+
+        if (resetTimer) {
+            playerState.timer = TIMER_ZERO
+        }
+
         playerStateLiveData.postValue(playerState)
     }
 
@@ -85,8 +95,8 @@ class PlayerViewModel(
 
     // Переключение состояния плеера
     fun togglePlay() {
-        if (playerState.playbackState == PlaybackState.PAUSED ||
-            playerState.playbackState == PlaybackState.PREPARED
+        if (playerState.playbackState is PlaybackState.Paused ||
+            playerState.playbackState is PlaybackState.Prepared
         ) {
             startPlayer()
         } else {
@@ -107,13 +117,13 @@ class PlayerViewModel(
     // Освобождает плеер
     fun releaseMediaPlayer() {
         // Останавливем воспроизмедение что-бы избежать обращение к плееру в параллельном потоке
-        playerState.playbackState = PlaybackState.PAUSED
+        playerState.playbackState = PlaybackState.Paused
         playerStateLiveData.postValue(playerState)
         playerInteractor.release()
     }
 
     companion object {
-        const val TIMER_UPDATE_DELAY = 500L
-        const val TIMER_ZERO = "00.00"
+        private const val TIMER_UPDATE_DELAY = 300L
+        private const val TIMER_ZERO = "00:00"
     }
 }
