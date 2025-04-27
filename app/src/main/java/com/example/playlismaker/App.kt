@@ -4,21 +4,32 @@ import android.app.Application
 import android.app.UiModeManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlismaker.creator.Creator
+import com.example.playlismaker.di.dataModule
+import com.example.playlismaker.di.interactorModule
+import com.example.playlismaker.di.repositoryModule
+import com.example.playlismaker.di.viewModelModule
 import com.example.playlismaker.settings.domain.api.SettingsInteractor
+import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class App: Application() {
     var darkTheme: Boolean = false
     private lateinit var settingsInteractor: SettingsInteractor
     override fun onCreate() {
-        settingsInteractor = Creator.provideSettingsInteractor(this)
+        super.onCreate()
+
+        startKoin {
+            androidContext(this@App)
+            modules(dataModule, repositoryModule, interactorModule, viewModelModule)
+        }
+
+        settingsInteractor = getKoin().get()
         val darkThemeSetting = settingsInteractor.getDarkMode()
 
         if (darkThemeSetting != null) {
             switchTheme(darkThemeSetting)
         }
-
-        super.onCreate()
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
@@ -38,10 +49,5 @@ class App: Application() {
         } else {
             AppCompatDelegate.setDefaultNightMode(mode)
         }
-    }
-
-    companion object {
-        const val PREFERENCES_STORAGE_ID = "playlistmaker_storage"
-        const val SEARCH_HISTORY_STORAGE_ID = "search_history"
     }
 }

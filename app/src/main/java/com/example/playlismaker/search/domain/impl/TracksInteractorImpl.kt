@@ -4,11 +4,12 @@ import com.example.playlismaker.search.domain.model.Track
 import com.example.playlismaker.search.domain.api.TracksInteractor
 import com.example.playlismaker.search.domain.api.TracksRepository
 import java.io.IOException
-import java.util.concurrent.Executors
+import java.util.concurrent.Executor
 
-class TracksInteractorImpl(private val tracksRepository: TracksRepository) : TracksInteractor {
-    private val executor = Executors.newCachedThreadPool()
-
+class TracksInteractorImpl(
+    private val tracksRepository: TracksRepository,
+    private val executor: Executor
+) : TracksInteractor {
     override fun search(expression: String, consumer: TracksInteractor.TracksConsumer) {
         executor.execute {
             try {

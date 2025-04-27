@@ -10,7 +10,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlismaker.R
 import com.example.playlismaker.databinding.ActivitySearchBinding
 import com.example.playlismaker.search.domain.model.Track
@@ -18,6 +17,8 @@ import com.example.playlismaker.search.presentation.SearchAdapter
 import com.example.playlismaker.player.ui.PlayerActivity
 import com.example.playlismaker.search.domain.model.ListState
 import com.example.playlismaker.search.presentation.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SearchActivity : ComponentActivity() {
     private lateinit var binding: ActivitySearchBinding
@@ -25,7 +26,7 @@ class SearchActivity : ComponentActivity() {
     private var placeholderImg: Int = R.drawable.not_found
     private val tracksList: ArrayList<Track> = ArrayList()
     private lateinit var searchAdapter: SearchAdapter
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModel { parametersOf() }
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var trackClickAllowed = true
@@ -35,10 +36,6 @@ class SearchActivity : ComponentActivity() {
 
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            this, SearchViewModel.getViewModelFactory()
-        )[SearchViewModel::class.java]
 
         viewModel.getSearchStateLiveData().observe(this) { state ->
             when (state) {
