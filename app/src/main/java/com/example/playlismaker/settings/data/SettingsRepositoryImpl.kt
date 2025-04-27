@@ -1,13 +1,13 @@
 package com.example.playlismaker.settings.data
 
+import com.example.playlismaker.data.PreferencesClient
 import com.example.playlismaker.data.dto.GetBooleanValueRequest
 import com.example.playlismaker.data.dto.GetBooleanValueResponse
 import com.example.playlismaker.data.dto.SetBooleanValueRequest
-import com.example.playlismaker.data.local.SharedPreferencesClient
 import com.example.playlismaker.settings.domain.api.SettingsRepository
 
 class SettingsRepositoryImpl(
-    private val preferencesClient: SharedPreferencesClient
+    private val preferencesClient: PreferencesClient
 ): SettingsRepository {
     override fun setDarkMode(mode: Boolean) {
         preferencesClient.doRequest(SetBooleanValueRequest(DARK_MODE_ID, mode))

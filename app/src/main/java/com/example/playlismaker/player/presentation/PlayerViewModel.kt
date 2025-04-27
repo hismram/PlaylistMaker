@@ -3,12 +3,6 @@ package com.example.playlismaker.player.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlismaker.App
-import com.example.playlismaker.creator.Creator
 import com.example.playlismaker.player.domain.api.PlayerInteractor
 import com.example.playlismaker.player.domain.model.PlaybackState
 import com.example.playlismaker.player.domain.model.PlayerState
@@ -119,18 +113,6 @@ class PlayerViewModel(
     }
 
     companion object {
-        fun getViewModelFactory(trackId: Int): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-
-                val interactor = Creator.providePlayerInteractor((this[APPLICATION_KEY] as App))
-
-                PlayerViewModel(
-                    trackId,
-                    interactor
-                )
-            }
-        }
-
         const val TIMER_UPDATE_DELAY = 500L
         const val TIMER_ZERO = "00.00"
     }

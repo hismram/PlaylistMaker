@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlismaker.Helpers
@@ -13,12 +12,16 @@ import com.example.playlismaker.databinding.ActivityPlayerBinding
 import com.example.playlismaker.player.domain.model.PlaybackState
 import com.example.playlismaker.player.domain.model.TrackData
 import com.example.playlismaker.player.presentation.PlayerViewModel
+import org.koin.core.parameter.parametersOf
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : ComponentActivity() {
     private var trackId: Int = -1
 
     private lateinit var binding: ActivityPlayerBinding
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel: PlayerViewModel by viewModel {
+        parametersOf(trackId)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +33,6 @@ class PlayerActivity : ComponentActivity() {
 
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(
-            this,
-            PlayerViewModel.getViewModelFactory(
-                trackId
-            )
-        )[PlayerViewModel::class.java]
 
         viewModel.getPlayerStateLiveData().observe(this) { playerState ->
             if (playerState != null) {

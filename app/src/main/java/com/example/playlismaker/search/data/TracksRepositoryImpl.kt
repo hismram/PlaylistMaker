@@ -1,10 +1,10 @@
 package com.example.playlismaker.search.data
 
 import com.example.playlismaker.data.NetworkClient
+import com.example.playlismaker.data.PreferencesClient
 import com.example.playlismaker.data.dto.GetStringValueRequest
 import com.example.playlismaker.data.dto.GetStringValueResponse
 import com.example.playlismaker.data.dto.SetStringValueRequest
-import com.example.playlismaker.data.local.SharedPreferencesClient
 import com.example.playlismaker.search.domain.api.TracksRepository
 import com.example.playlismaker.search.domain.model.Track
 import com.example.playlismaker.search.data.dto.*
@@ -12,8 +12,9 @@ import com.google.gson.Gson
 
 class TracksRepositoryImpl(
     private val historyId: String,
+    private val gson: Gson,
     private val networkClient: NetworkClient,
-    private val preferencesClient: SharedPreferencesClient
+    private val preferencesClient: PreferencesClient
 ) : TracksRepository {
     private val historyList: ArrayList<Track>
 
@@ -57,7 +58,7 @@ class TracksRepositoryImpl(
             historyList.removeLast()
         }
 
-        val jsonList = Gson().toJson(historyList)
+        val jsonList = gson.toJson(historyList)
 
         preferencesClient.doRequest(SetStringValueRequest(historyId, jsonList))
     }
@@ -70,7 +71,7 @@ class TracksRepositoryImpl(
         val response = preferencesClient.doRequest(GetStringValueRequest(historyId))
 
         return if (response is GetStringValueResponse) {
-            Gson().fromJson(
+            gson.fromJson(
                 response.results ?: EMPTY_LIST,
                 Array<Track>::class.java
             ).toCollection(ArrayList())

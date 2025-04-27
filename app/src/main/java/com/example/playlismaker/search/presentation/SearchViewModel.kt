@@ -3,12 +3,6 @@ package com.example.playlismaker.search.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlismaker.App
-import com.example.playlismaker.creator.Creator
 import com.example.playlismaker.search.domain.api.TracksInteractor
 import com.example.playlismaker.search.domain.model.ListState
 import com.example.playlismaker.search.domain.model.Track
@@ -61,15 +55,5 @@ class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
 
     fun resetHistory() {
         tracksInteractor.clearHistory()
-    }
-
-    companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val interactor = Creator.provideTracksInteractor(this[APPLICATION_KEY] as App)
-
-                SearchViewModel(interactor)
-            }
-        }
     }
 }
