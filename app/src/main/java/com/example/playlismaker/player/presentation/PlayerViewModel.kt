@@ -37,7 +37,7 @@ class PlayerViewModel(
     /**
      * Фоновая задача обновления таймера воспроизведения
      */
-    private var timerJob: Job? = null;
+    private var timerJob: Job? = null
 
     init {
         loadTrackData()
@@ -45,7 +45,7 @@ class PlayerViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        timerJob?.cancel();
+        timerJob?.cancel()
     }
 
     /**
