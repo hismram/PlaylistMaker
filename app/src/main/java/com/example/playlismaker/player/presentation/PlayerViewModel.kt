@@ -3,96 +3,154 @@ package com.example.playlismaker.player.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlismaker.App
-import com.example.playlismaker.creator.Creator
+import androidx.lifecycle.viewModelScope
 import com.example.playlismaker.player.domain.api.PlayerInteractor
 import com.example.playlismaker.player.domain.model.PlaybackState
 import com.example.playlismaker.player.domain.model.PlayerState
 import com.example.playlismaker.player.domain.model.TrackData
 import com.example.playlismaker.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+/**
+ * VievModel для управления плеером
+ * @property trackId Идентификатор трека
+ * @property playerInteractor Интерактор плеера
+ */
 class PlayerViewModel(
-    trackId: Int,
-    val playerInteractor: PlayerInteractor
+    private val trackId: Int,
+    private val playerInteractor: PlayerInteractor
 ): ViewModel() {
+
+    /**
+     * Текущее состоние плеера
+     */
     private lateinit var playerState: PlayerState
+
+    /**
+     * LiveData для наблюдения за состоянием плеера
+     * Инициализируется null и обновляется после загрузки данных трека
+     */
     private var playerStateLiveData = MutableLiveData<PlayerState>(null)
 
-    // Обновление таймера во время воспроизведения
-    private val playbackTimerUpdate = object : Runnable {
-        override fun run() {
-            while (playerState.playbackState == PlaybackState.PLAYING) {
-                playerState.timer = playerInteractor.getPlaybackTimer()
-                playerStateLiveData.postValue(playerState)
-                Thread.sleep(TIMER_UPDATE_DELAY)
-            }
-        }
-    }
-
+    /**
+     * Фоновая задача обновления таймера воспроизведения
+     */
+    private var timerJob: Job? = null
 
     init {
-        // Получение данных трека и иницализация плеера
+        loadTrackData()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        timerJob?.cancel()
+    }
+
+    /**
+     * Загружает данные трека, иницилизирует состоние и плеер
+     */
+    private fun loadTrackData() {
         playerInteractor.loadTrackData(
             trackId,
             object : PlayerInteractor.PlayerConsumer {
                 override fun consume(
                     track: Track
                 ) {
-                    playerState = PlayerState(
-                        favorite = false,
-                        inLibrary = false,
-                        playbackState = PlaybackState.PREPARED,
-                        timer = TIMER_ZERO,
-                        trackData = TrackData(
-                            name = track.trackName,
-                            artist = track.artistName,
-                            album = track.collectionName,
-                            genre = track.primaryGenreName,
-                            year = track.getReleaseDate(),
-                            country = track.country,
-                            cover = track.getLargeArtwork(),
-                            duraration = track.getTrackTime()
-                        )
-                    )
-
-                    playerStateLiveData.postValue(playerState)
+                    initializePlayerState(track)
                 }
 
                 override fun error() {}
             },
-            {
-                playerState.playbackState = PlaybackState.PAUSED
-                playerState.timer = TIMER_ZERO
-                playerStateLiveData.postValue(playerState)
-            }
+            onCompleteListener = { pausePlayer(true) }
         )
     }
 
-    // Запуск плеера
+    /**
+     * Иницилизирует состояние плеера
+     * @param track Данные трека
+     */
+    private fun initializePlayerState(track: Track) {
+        playerState = PlayerState(
+            favorite = false,
+            inLibrary = false,
+            playbackState = PlaybackState.Prepared,
+            timer = TIMER_ZERO,
+            trackData = TrackData(
+                name = track.trackName,
+                artist = track.artistName,
+                album = track.collectionName,
+                genre = track.primaryGenreName,
+                year = track.getReleaseDate(),
+                country = track.country,
+                cover = track.getLargeArtwork(),
+                duraration = track.getTrackTime()
+            )
+        )
+
+        playerStateLiveData.postValue(playerState)
+    }
+
+    /**
+     * Запускает задачу обновления таймера воспроизведения
+     * Обновление таймера происходит каждые [TIMER_UPDATE_DELAY] миллисекунд
+     */
+    private fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (playerState.playbackState is PlaybackState.Playing) {
+                delay(TIMER_UPDATE_DELAY)
+                updatePlaybackTimer()
+            }
+        }
+    }
+
+    /**
+     * Обновляет таймер
+     */
+    private fun updatePlaybackTimer() {
+        playerState.timer = playerInteractor.getPlaybackTimer()
+        playerStateLiveData.postValue(playerState)
+    }
+
+    /**
+     * Запускает воспроизведение
+     */
     private fun startPlayer() {
         playerInteractor.play()
-        Thread(playbackTimerUpdate).start()
-        playerState.playbackState = PlaybackState.PLAYING
+        playerState.playbackState = PlaybackState.Playing
         playerStateLiveData.postValue(playerState)
+        startTimer()
     }
 
-    // Остановка плеера
-    private fun pausePlayer() {
+    /**
+     * Остонавливает воспроизведение
+     * @param resetTimer Сброс таймера при остановке
+     */
+    private fun pausePlayer(resetTimer: Boolean = false) {
+        timerJob?.cancel()
         playerInteractor.pause()
-        playerState.playbackState = PlaybackState.PAUSED
+        playerState.playbackState = PlaybackState.Paused
+
+        if (resetTimer) {
+            playerState.timer = TIMER_ZERO
+        }
+
         playerStateLiveData.postValue(playerState)
     }
 
+    /**
+     * Возвращает [LiveData] с текущим состоянием плеера
+     * @return [LiveData]<[PlayerState]> Для отслеживания состояния
+     */
     fun getPlayerStateLiveData(): LiveData<PlayerState> = playerStateLiveData
 
-    // Переключение состояния плеера
+    /**
+     * Переключает воспроизведение
+     */
     fun togglePlay() {
-        if (playerState.playbackState == PlaybackState.PAUSED ||
-            playerState.playbackState == PlaybackState.PREPARED
+        if (playerState.playbackState is PlaybackState.Paused ||
+            playerState.playbackState is PlaybackState.Prepared
         ) {
             startPlayer()
         } else {
@@ -100,38 +158,36 @@ class PlayerViewModel(
         }
     }
 
+    /**
+     * Переключает состояние "Избранного" трека
+     */
     fun toggleFavorite() {
         playerState.favorite = !playerState.favorite
         playerStateLiveData.postValue(playerState)
     }
 
+    /**
+     * Переключает состояние "В библиотеке"
+     */
     fun toggleInLibrary() {
         playerState.inLibrary = !playerState.inLibrary
         playerStateLiveData.postValue(playerState)
     }
 
-    // Освобождает плеер
+    /**
+     * Освобождает плеер
+     */
     fun releaseMediaPlayer() {
         // Останавливем воспроизмедение что-бы избежать обращение к плееру в параллельном потоке
-        playerState.playbackState = PlaybackState.PAUSED
+        playerState.playbackState = PlaybackState.Paused
         playerStateLiveData.postValue(playerState)
         playerInteractor.release()
     }
 
     companion object {
-        fun getViewModelFactory(trackId: Int): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-
-                val interactor = Creator.providePlayerInteractor((this[APPLICATION_KEY] as App))
-
-                PlayerViewModel(
-                    trackId,
-                    interactor
-                )
-            }
-        }
-
-        const val TIMER_UPDATE_DELAY = 500L
-        const val TIMER_ZERO = "00.00"
+        /** Интервал обновления таймера */
+        private const val TIMER_UPDATE_DELAY = 300L
+        /** Начальное значение таймера */
+        private const val TIMER_ZERO = "00:00"
     }
 }

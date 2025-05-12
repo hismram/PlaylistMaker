@@ -5,7 +5,6 @@ import com.example.playlismaker.data.dto.Response
 import com.example.playlismaker.data.dto.ResponseCodes
 import com.example.playlismaker.search.data.dto.SearchRequest
 
-
 class RetrofitNetworkClient(val iTunesService: ITunesApi) : NetworkClient {
 
     override fun doRequest(dto: Any): Response {
