@@ -98,6 +98,13 @@
         <item name="android:lines">1</item>
     </style>
 
+    <style name="BottomNavigation">
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/text_size_s</item>
+        <item name="itemIconTint">@drawable/nav_tabs_icon</item>
+        <item name="itemTextColor">@drawable/nav_tabs_text</item>
+    </style>
+
     <style name="InputLayout">
         <item name="android:background">@drawable/input_background</item>
     </style>
