@@ -1,33 +1,26 @@
 package com.example.playlistmaker.main.ui
 
-import android.content.Intent
-import com.example.playlistmaker.search.ui.SearchActivity
-import com.example.playlistmaker.library.ui.LibraryActivity
-import com.example.playlistmaker.settings.ui.SettingsActivity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
-import com.google.android.material.button.MaterialButton
+import com.example.playlistmaker.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val search = findViewById<MaterialButton>(R.id.search)
-        val mediaLib = findViewById<MaterialButton>(R.id.media_lib)
-        val settings = findViewById<MaterialButton>(R.id.settings)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        search.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
-        }
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+                as NavHostFragment
+        val navController = navHostFragment.navController
 
-        mediaLib.setOnClickListener {
-            startActivity(Intent(this, LibraryActivity::class.java))
-        }
-
-        settings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
+        binding.bottomNavigationView.setupWithNavController(navController)
     }
 }
