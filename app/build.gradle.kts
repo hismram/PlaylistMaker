@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.playlismaker"
+    namespace = "com.example.playlistmaker"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.playlismaker"
+        applicationId = "com.example.playlistmaker"
         minSdk = 29
         targetSdk = 34
         versionCode = 1

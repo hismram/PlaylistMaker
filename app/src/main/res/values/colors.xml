@@ -4,6 +4,7 @@
     <color name="main_menu_background">@color/yp_blue</color>
 
     <color name="progress_bar">@color/yp_blue</color>
+    <color name="tabs_indicator">@color/yp_black</color>
 
     <color name="switch_thumb">@color/yp_text_gray</color>
     <color name="switch_track">@color/yp_light_gray</color>
