@@ -7,6 +7,9 @@
     <string name="search_history_header">Вы искали</string>
     <string name="search_history_clear">Очистить историю</string>
 
+    <string name="favorite_tracks">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
+
     <string name="duration">Длительность</string>
     <string name="album">Альбом</string>
     <string name="year">Год</string>
@@ -18,6 +21,9 @@
 
     <string name="not_found">Ничего не нашлось</string>
     <string name="network_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="empty_favorite">Ваша медиатека пуста</string>
+    <string name="empty_playlists">Вы не создали ни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
 
     <string name="course_link">https://practicum.yandex.ru/android-developer/</string>
 
