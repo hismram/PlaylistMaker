@@ -1,28 +1,39 @@
 package com.example.playlistmaker.settings.ui
 
 import android.app.UiModeManager
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import androidx.fragment.app.Fragment
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.settings.presentation.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
-class SettingsActivity : ComponentActivity() {
-    private val viewModel: SettingsViewModel by viewModel { parametersOf() }
-    private lateinit var binding: ActivitySettingsBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+class SettingsFragment : Fragment() {
+    private val viewModel: SettingsViewModel by viewModel()
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get(): FragmentSettingsBinding = _binding!!
 
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentSettingsBinding.inflate(
+            inflater, container, false
+        )
 
+        val activity = requireActivity()
         val darkMode = if (viewModel.getThemeLiveData().value != null) {
             viewModel.getThemeLiveData().value!!
         } else {
-            val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+            val uiModeManager = activity.getSystemService(
+                Context.UI_MODE_SERVICE
+            ) as UiModeManager
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 uiModeManager.nightMode == UiModeManager.MODE_NIGHT_YES
@@ -31,7 +42,6 @@ class SettingsActivity : ComponentActivity() {
             }
         }
 
-        binding.toolbar.setOnClickListener { finish() }
         binding.themeSwitcher.isChecked = darkMode
         binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.changeTheme(checked)
@@ -39,5 +49,12 @@ class SettingsActivity : ComponentActivity() {
         binding.share.setOnClickListener { viewModel.share() }
         binding.writeToSupport.setOnClickListener { viewModel.writeToSupport() }
         binding.termsOfUse.setOnClickListener { viewModel.termsOfUse() }
+
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

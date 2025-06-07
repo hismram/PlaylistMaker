@@ -6,15 +6,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/base_background"
-    tools:context=".search.ui.SearchActivity">
+    tools:context=".search.ui.SearchFragment">
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:title="@string/media_lib"
-        app:navigationIconTint="@color/icon_base"
-        app:navigationIcon="@drawable/arrow_back_icon"
-        />
+    />
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         style="@style/LibraryTabsLayout"

@@ -1,43 +1,47 @@
 package com.example.playlistmaker.search.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.presentation.SearchAdapter
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.model.ListState
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
-class SearchActivity : ComponentActivity() {
-    private lateinit var binding: ActivitySearchBinding
+class SearchFragment : Fragment() {
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get(): FragmentSearchBinding = _binding!!
     private var searchString: String = SEARCH_DEFAULT
     private var placeholderImg: Int = R.drawable.not_found
     private val tracksList: ArrayList<Track> = ArrayList()
     private lateinit var searchAdapter: SearchAdapter
-    private val viewModel: SearchViewModel by viewModel { parametersOf() }
+    private val viewModel: SearchViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var trackClickAllowed = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        viewModel.getSearchStateLiveData().observe(this) { state ->
+        viewModel.getSearchStateLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
                 ListState.Error -> showPlaceholder(
                     R.string.network_error, R.drawable.network_error
@@ -63,25 +67,18 @@ class SearchActivity : ComponentActivity() {
             }
         }
 
-        binding.searchInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            // Обработка изменения введенного значения
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Отображаем кнопку сброса только если есть введенное значение
-                binding.searchCross.isVisible = !s.isNullOrEmpty()
-                if (binding.searchInput.hasFocus() && s.isNullOrEmpty()) {
-                    viewModel.showHistory()
-                } else {
-                    clearList()
-                }
-                // Сохраняем результат ввода в переменную
-                searchString = s.toString()
-                searchDebounce()
+        binding.searchInput.doOnTextChanged { text, _, _, _ ->
+            // Отображаем кнопку сброса только если есть введенное значение
+            binding.searchCross.isVisible = !text.isNullOrEmpty()
+            if (binding.searchInput.hasFocus() && text.isNullOrEmpty()) {
+                viewModel.showHistory()
+            } else {
+                clearList()
             }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
+            // Сохраняем результат ввода в переменную
+            searchString = text.toString()
+            searchDebounce()
+        }
 
         binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -92,9 +89,15 @@ class SearchActivity : ComponentActivity() {
         }
         binding.tracksViewPlaceholderReload.setOnClickListener { search() }
         binding.searchCross.setOnClickListener { resetSearch() }
-        binding.toolbar.setOnClickListener { finish() }
+
+        return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacksAndMessages(null)
+        _binding = null
+    }
 
     /**
      * debounce клика по треку
@@ -122,7 +125,7 @@ class SearchActivity : ComponentActivity() {
     private fun openPlayer(track: Track) {
         viewModel.addToHistory(track)
 
-        val intent = Intent(this, PlayerActivity::class.java)
+        val intent = Intent(activity, PlayerActivity::class.java)
 
         intent.putExtra(PlayerActivity.Companion.TRACK_ID, track.trackId)
 
@@ -141,7 +144,7 @@ class SearchActivity : ComponentActivity() {
      * Запускает поиск, заполняеет список треков результом или показывает заглушку
      */
     private fun search() {
-        if (binding.searchInput.text.isNotEmpty()) {
+        if (isAdded && binding.searchInput.text.isNotEmpty()) {
             viewModel.search(binding.searchInput.text.toString())
         }
     }
@@ -174,6 +177,8 @@ class SearchActivity : ComponentActivity() {
      * Скрывает заглушку, показывает реестр
      */
     private fun showList(tracks: List<Track>) {
+        if (!isAdded) return
+
         tracksList.clear()
         tracksList.addAll(tracks)
         searchAdapter.notifyDataSetChanged()
@@ -199,13 +204,9 @@ class SearchActivity : ComponentActivity() {
      * Сбрасывает строку и результаты поиска, скрывает заглушки, показывает список
      */
     private fun resetSearch() {
-        val view = this.currentFocus
-        val inputMethodManager =
-            getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
-
-        if (view != null) {
-            inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
-        }
+        val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE)
+                as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(binding.searchInput.windowToken, 0)
         binding.searchInput.setText(SEARCH_DEFAULT)
         viewModel.showHistory()
     }
