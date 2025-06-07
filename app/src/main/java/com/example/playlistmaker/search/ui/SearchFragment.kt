@@ -5,14 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
@@ -34,25 +33,6 @@ class SearchFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { search() }
     private var trackClickAllowed = true
-    private val textWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        // Обработка изменения введенного значения
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            // Отображаем кнопку сброса только если есть введенное значение
-            binding.searchCross.isVisible = !s.isNullOrEmpty()
-            if (binding.searchInput.hasFocus() && s.isNullOrEmpty()) {
-                viewModel.showHistory()
-            } else {
-                clearList()
-            }
-            // Сохраняем результат ввода в переменную
-            searchString = s.toString()
-            searchDebounce()
-        }
-
-        override fun afterTextChanged(s: Editable?) {}
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,7 +67,18 @@ class SearchFragment : Fragment() {
             }
         }
 
-        binding.searchInput.addTextChangedListener(textWatcher)
+        binding.searchInput.doOnTextChanged { text, _, _, _ ->
+            // Отображаем кнопку сброса только если есть введенное значение
+            binding.searchCross.isVisible = !text.isNullOrEmpty()
+            if (binding.searchInput.hasFocus() && text.isNullOrEmpty()) {
+                viewModel.showHistory()
+            } else {
+                clearList()
+            }
+            // Сохраняем результат ввода в переменную
+            searchString = text.toString()
+            searchDebounce()
+        }
 
         binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -105,7 +96,6 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
-        binding.searchInput.removeTextChangedListener(textWatcher)
         _binding = null
     }
 
