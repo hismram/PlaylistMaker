@@ -7,9 +7,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.Helpers
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.utils.dpToPx
 
 class SearchViewHolder(trackView: View): RecyclerView.ViewHolder(trackView) {
     private val trackCover: ImageView = trackView.findViewById(R.id.track_cover)
@@ -24,7 +24,8 @@ class SearchViewHolder(trackView: View): RecyclerView.ViewHolder(trackView) {
             .load(model.artworkUrl100)
             .placeholder(R.drawable.cover_placeholder)
             .transform(RoundedCorners(
-                Helpers.dpToPx(
+
+                dpToPx(
                     context.resources.getFloat(R.dimen.track_cover_corner_radius),
                     context
                 )

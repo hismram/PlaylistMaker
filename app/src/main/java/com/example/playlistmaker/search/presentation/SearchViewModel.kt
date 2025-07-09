@@ -3,9 +3,11 @@ package com.example.playlistmaker.search.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.model.ListState
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.launch
 
 class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
     private var searchString: String = ""
@@ -22,20 +24,25 @@ class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
 
         searchStateLiveData.postValue(ListState.Loading)
         this.searchString = searchString
-        tracksInteractor.search(searchString,object : TracksInteractor.TracksConsumer {
-            override fun consume(tracks: List<Track>) {
-                if (tracks.isNotEmpty()) {
-                    searchStateLiveData.postValue(ListState.Loaded(tracks))
-                } else {
-                    searchStateLiveData.postValue(ListState.NotFound)
+
+        viewModelScope.launch {
+            tracksInteractor
+                .search(searchString)
+                .collect {
+                    pair ->
+                    val tracks = pair.first
+
+                    if (tracks != null) {
+                        if (tracks.isNotEmpty()) {
+                            searchStateLiveData.postValue(ListState.Loaded(tracks))
+                        } else {
+                            searchStateLiveData.postValue(ListState.NotFound)
+                        }
+                    } else {
+                        searchStateLiveData.postValue(ListState.Error)
+                    }
                 }
-            }
-
-            override fun error() {
-                searchStateLiveData.postValue(ListState.Error)
-            }
-
-        })
+        }
     }
 
     fun showHistory() {

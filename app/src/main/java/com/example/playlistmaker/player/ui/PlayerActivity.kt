@@ -6,7 +6,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.Helpers
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.domain.model.PlaybackState
@@ -14,6 +13,7 @@ import com.example.playlistmaker.player.domain.model.TrackData
 import com.example.playlistmaker.player.presentation.PlayerViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.example.playlistmaker.utils.dpToPx
 
 class PlayerActivity : ComponentActivity() {
     private var trackId: Int = -1
@@ -99,7 +99,7 @@ class PlayerActivity : ComponentActivity() {
             .placeholder(R.drawable.album_placeholder)
             .transform(
                 RoundedCorners(
-                    Helpers.Companion.dpToPx(
+                    dpToPx(
                         context.resources.getFloat(R.dimen.track_cover_large_corner_radius),
                         context
                     )
