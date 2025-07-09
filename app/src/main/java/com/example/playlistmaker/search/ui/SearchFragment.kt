@@ -70,7 +70,7 @@ class SearchFragment : Fragment() {
 
         searchAdapter = SearchAdapter(tracksList) {
             if (trackClickAllowed) {
-                trackClickAllowed = false;
+                trackClickAllowed = false
                 openPlayer(it)
                 allowTrackClickDebounce(it)
             }
