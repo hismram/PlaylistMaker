@@ -4,7 +4,7 @@ import com.example.playlistmaker.search.domain.model.Track
 import kotlinx.coroutines.flow.Flow
 
 interface TracksInteractor {
-    fun search(expression: String): Flow<Pair<List<Track>?, String?>>
+    fun search(expression: String): Flow<Result<List<Track>>>
 
     fun getHistory(consumer: TracksConsumer)
 

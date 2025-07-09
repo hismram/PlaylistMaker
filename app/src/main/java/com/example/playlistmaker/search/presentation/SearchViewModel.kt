@@ -29,16 +29,16 @@ class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
             tracksInteractor
                 .search(searchString)
                 .collect {
-                    pair ->
-                    val tracks = pair.first
-
-                    if (tracks != null) {
+                    it.onSuccess {
+                        tracks ->
                         if (tracks.isNotEmpty()) {
                             searchStateLiveData.postValue(ListState.Loaded(tracks))
                         } else {
                             searchStateLiveData.postValue(ListState.NotFound)
                         }
-                    } else {
+                    }
+
+                    it.onFailure {
                         searchStateLiveData.postValue(ListState.Error)
                     }
                 }

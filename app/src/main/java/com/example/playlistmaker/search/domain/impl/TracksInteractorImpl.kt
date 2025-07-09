@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class TracksInteractorImpl(
     private val tracksRepository: TracksRepository
 ) : TracksInteractor {
-    override fun search(expression: String): Flow<Pair<List<Track>?, String?>> {
+    override fun search(expression: String): Flow<Result<List<Track>>> {
         return tracksRepository.search(expression)
     }
 

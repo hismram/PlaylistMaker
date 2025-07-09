@@ -25,7 +25,7 @@ class TracksRepositoryImpl(
         historyList = readHistory()
     }
 
-    override fun search(expression: String): Flow<Pair<List<Track>?, String?>> = flow {
+    override fun search(expression: String): Flow<Result<List<Track>>> = flow {
         try {
             val response = networkClient.doRequest(SearchRequest(expression))
 
@@ -45,13 +45,13 @@ class TracksRepositoryImpl(
                             it.trackTimeMillis
                         )
                     }
-                    emit(Pair(data, null))
+                    emit(Result.success(data))
                 }
             } else {
-                emit(Pair(emptyList(), null))
+                emit(Result.success(emptyList()))
             }
         } catch (e: IOException) {
-            emit(Pair(null, e.message))
+            emit(Result.failure(e))
         }
     }
 
