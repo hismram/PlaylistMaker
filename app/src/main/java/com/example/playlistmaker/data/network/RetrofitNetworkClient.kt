@@ -4,8 +4,6 @@ import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.dto.Response
 import com.example.playlistmaker.data.dto.ResponseCodes
 import com.example.playlistmaker.search.data.dto.SearchRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class RetrofitNetworkClient(val iTunesService: ITunesApi) : NetworkClient {
 

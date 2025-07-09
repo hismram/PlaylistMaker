@@ -33,8 +33,8 @@ class SearchFragment : Fragment() {
     private lateinit var searchAdapter: SearchAdapter
     private val viewModel: SearchViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
-    private lateinit var searchDebounce: (String) -> Unit;
-    private lateinit var allowTrackClickDebounce: (Track) -> Unit;
+    private lateinit var searchDebounce: (String) -> Unit
+    private lateinit var allowTrackClickDebounce: (Track) -> Unit
     private var trackClickAllowed = true
 
     override fun onCreateView(

@@ -65,7 +65,7 @@ class TracksRepositoryImpl(
         historyList.add(0, track)
 
         if (historyList.size > 10) {
-            historyList.removeLast()
+            historyList.removeAt(historyList.lastIndex)
         }
 
         val jsonList = gson.toJson(historyList)
