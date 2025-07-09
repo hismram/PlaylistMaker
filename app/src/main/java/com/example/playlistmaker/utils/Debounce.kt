@@ -16,7 +16,7 @@ fun <T> debounce(
     return {
         params: T ->
         if (useLastParams) {
-            debounceJob?.cancel();
+            debounceJob?.cancel()
         }
 
         if (debounceJob?.isCompleted != false || useLastParams) {
