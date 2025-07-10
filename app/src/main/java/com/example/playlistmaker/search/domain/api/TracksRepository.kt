@@ -1,9 +1,10 @@
 package com.example.playlistmaker.search.domain.api
 
 import com.example.playlistmaker.search.domain.model.Track
+import kotlinx.coroutines.flow.Flow
 
 interface TracksRepository {
-    fun search(expression: String): List<Track>
+    fun search(expression: String): Flow<Result<List<Track>>>
 
     fun searchHistory(): List<Track>
 

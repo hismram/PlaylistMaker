@@ -7,11 +7,10 @@ import com.example.playlistmaker.search.data.dto.SearchRequest
 
 class RetrofitNetworkClient(val iTunesService: ITunesApi) : NetworkClient {
 
-    override fun doRequest(dto: Any): Response {
+    override suspend fun doRequest(dto: Any): Response {
         return if (dto is SearchRequest) {
-            val response = iTunesService.search(dto.expression).execute()
-            val body = response.body() ?: Response()
-            body.apply { resultCode = response.code() }
+            val response = iTunesService.search(dto.expression)
+            response.apply { resultCode = ResponseCodes.OK }
         } else {
             Response().apply { resultCode = ResponseCodes.BAD_REQUEST }
         }

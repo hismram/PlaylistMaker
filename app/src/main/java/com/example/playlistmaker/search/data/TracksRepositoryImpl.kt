@@ -9,6 +9,9 @@ import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.model.Track
 import com.example.playlistmaker.search.data.dto.*
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.io.IOException
 
 class TracksRepositoryImpl(
     private val historyId: String,
@@ -22,26 +25,33 @@ class TracksRepositoryImpl(
         historyList = readHistory()
     }
 
-    override fun search(expression: String): List<Track> {
-        val response = networkClient.doRequest(SearchRequest(expression))
+    override fun search(expression: String): Flow<Result<List<Track>>> = flow {
+        try {
+            val response = networkClient.doRequest(SearchRequest(expression))
 
-        if (response.resultCode == 200) {
-            return (response as SearchResponse).results.map {
-                Track(
-                    it.trackId,
-                    it.trackName,
-                    it.collectionName,
-                    it.artistName,
-                    it.releaseDate,
-                    it.primaryGenreName,
-                    it.country,
-                    it.artworkUrl100,
-                    it.previewUrl,
-                    it.trackTimeMillis
-                )
+            if (response.resultCode == 200) {
+                with (response as SearchResponse) {
+                    val data = response.results.map {
+                        Track(
+                            it.trackId,
+                            it.trackName,
+                            it.collectionName,
+                            it.artistName,
+                            it.releaseDate,
+                            it.primaryGenreName,
+                            it.country,
+                            it.artworkUrl100,
+                            it.previewUrl,
+                            it.trackTimeMillis
+                        )
+                    }
+                    emit(Result.success(data))
+                }
+            } else {
+                emit(Result.success(emptyList()))
             }
-        } else {
-            return emptyList()
+        } catch (e: IOException) {
+            emit(Result.failure(e))
         }
     }
 
@@ -55,7 +65,7 @@ class TracksRepositoryImpl(
         historyList.add(0, track)
 
         if (historyList.size > 10) {
-            historyList.removeLast()
+            historyList.removeAt(historyList.lastIndex)
         }
 
         val jsonList = gson.toJson(historyList)

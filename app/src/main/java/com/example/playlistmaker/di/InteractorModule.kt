@@ -14,7 +14,7 @@ import org.koin.dsl.module
 
 val interactorModule = module {
     factory<TracksInteractor> {
-        TracksInteractorImpl(get(), get())
+        TracksInteractorImpl(get())
     }
 
     factory<SettingsInteractor> {

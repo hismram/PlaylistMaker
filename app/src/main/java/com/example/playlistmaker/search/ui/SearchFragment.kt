@@ -13,6 +13,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.search.domain.model.Track
@@ -20,6 +21,7 @@ import com.example.playlistmaker.search.presentation.SearchAdapter
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.model.ListState
 import com.example.playlistmaker.search.presentation.SearchViewModel
+import com.example.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -31,7 +33,8 @@ class SearchFragment : Fragment() {
     private lateinit var searchAdapter: SearchAdapter
     private val viewModel: SearchViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable { search() }
+    private lateinit var searchDebounce: (String) -> Unit
+    private lateinit var allowTrackClickDebounce: (Track) -> Unit
     private var trackClickAllowed = true
 
     override fun onCreateView(
@@ -40,6 +43,19 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
+
+        searchDebounce = debounce<Any>(
+            SEARCH_DELAY,
+            viewModel.viewModelScope,
+            true
+        ) { search() }
+
+        allowTrackClickDebounce = debounce<Track>(
+            TRACK_CLICK_DELAY,
+            viewModel.viewModelScope,
+            true
+        ) { trackClickAllowed = true }
+
 
         viewModel.getSearchStateLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -53,7 +69,11 @@ class SearchFragment : Fragment() {
         }
 
         searchAdapter = SearchAdapter(tracksList) {
-            if (trackClickAllowed()) openPlayer(it)
+            if (trackClickAllowed) {
+                trackClickAllowed = false
+                openPlayer(it)
+                allowTrackClickDebounce(it)
+            }
         }
 
         binding.tracksView.adapter = searchAdapter
@@ -77,7 +97,7 @@ class SearchFragment : Fragment() {
             }
             // Сохраняем результат ввода в переменную
             searchString = text.toString()
-            searchDebounce()
+            searchDebounce(searchString)
         }
 
         binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
@@ -99,20 +119,6 @@ class SearchFragment : Fragment() {
         _binding = null
     }
 
-    /**
-     * debounce клика по треку
-     */
-    private fun trackClickAllowed(): Boolean {
-        val current = trackClickAllowed
-
-        if (trackClickAllowed) {
-            trackClickAllowed = false
-            handler.postDelayed({trackClickAllowed = true}, TRACK_CLICK_DELAY)
-        }
-
-        return current
-    }
-
     private fun clearList() {
         tracksList.clear()
         searchAdapter.notifyDataSetChanged()
@@ -130,14 +136,6 @@ class SearchFragment : Fragment() {
         intent.putExtra(PlayerActivity.Companion.TRACK_ID, track.trackId)
 
         startActivity(intent)
-    }
-
-    /**
-     * Запускает отложенную задачу на запуск поиска
-     */
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DELAY)
     }
 
     /**
