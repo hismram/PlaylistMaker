@@ -53,7 +53,7 @@ class PlayerInteractorImpl(
     }
 
     override suspend fun addToFavorite(track: Track) {
-        playerRepository.addToFavorite(track);
+        playerRepository.addToFavorite(track)
     }
 
     override suspend fun removeFromFavorite(id: Int) {

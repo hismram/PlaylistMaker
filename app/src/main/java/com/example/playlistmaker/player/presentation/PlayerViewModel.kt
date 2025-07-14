@@ -27,7 +27,7 @@ class PlayerViewModel(
      * Текущее состоние плеера
      */
     private lateinit var playerState: PlayerState
-    private lateinit var track: Track;
+    private lateinit var track: Track
 
     /**
      * LiveData для наблюдения за состоянием плеера
