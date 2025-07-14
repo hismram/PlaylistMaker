@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.domain.model
+package com.example.playlistmaker.domain.model
 
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
@@ -15,7 +15,8 @@ data class Track(
     val country: String?,
     val artworkUrl100: String?,
     val previewUrl: String?,
-    val trackTimeMillis: Int? = null
+    val trackTimeMillis: Int? = null,
+    var isFavorite: Boolean = false
 ) {
     fun toJSON(): String {
         return Gson().toJson(this)

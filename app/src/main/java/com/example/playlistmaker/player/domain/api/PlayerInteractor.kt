@@ -1,9 +1,9 @@
 package com.example.playlistmaker.player.domain.api
 
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.domain.model.Track
 
 interface PlayerInteractor {
-    fun loadTrackData(
+    suspend fun loadTrackData(
         trackId: Int,
         consumer: PlayerConsumer,
         onCompleteListener: () -> Unit
@@ -12,6 +12,8 @@ interface PlayerInteractor {
     fun play()
     fun pause()
     fun release()
+    suspend fun addToFavorite(track: Track)
+    suspend fun removeFromFavorite(id: Int)
 
 
     interface PlayerConsumer {

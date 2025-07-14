@@ -6,7 +6,7 @@ import com.example.playlistmaker.data.dto.GetStringValueRequest
 import com.example.playlistmaker.data.dto.GetStringValueResponse
 import com.example.playlistmaker.data.dto.SetStringValueRequest
 import com.example.playlistmaker.search.domain.api.TracksRepository
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.search.data.dto.*
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow

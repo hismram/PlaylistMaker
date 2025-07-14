@@ -8,7 +8,7 @@ import com.example.playlistmaker.player.domain.api.PlayerInteractor
 import com.example.playlistmaker.player.domain.model.PlaybackState
 import com.example.playlistmaker.player.domain.model.PlayerState
 import com.example.playlistmaker.player.domain.model.TrackData
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.domain.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,6 +27,7 @@ class PlayerViewModel(
      * Текущее состоние плеера
      */
     private lateinit var playerState: PlayerState
+    private lateinit var track: Track;
 
     /**
      * LiveData для наблюдения за состоянием плеера
@@ -52,19 +53,21 @@ class PlayerViewModel(
      * Загружает данные трека, иницилизирует состоние и плеер
      */
     private fun loadTrackData() {
-        playerInteractor.loadTrackData(
-            trackId,
-            object : PlayerInteractor.PlayerConsumer {
-                override fun consume(
-                    track: Track
-                ) {
-                    initializePlayerState(track)
-                }
+        viewModelScope.launch {
+            playerInteractor.loadTrackData(
+                trackId,
+                object : PlayerInteractor.PlayerConsumer {
+                    override fun consume(
+                        track: Track
+                    ) {
+                        initializePlayerState(track)
+                    }
 
-                override fun error() {}
-            },
-            onCompleteListener = { pausePlayer(true) }
-        )
+                    override fun error() {}
+                },
+                onCompleteListener = { pausePlayer(true) }
+            )
+        }
     }
 
     /**
@@ -72,8 +75,9 @@ class PlayerViewModel(
      * @param track Данные трека
      */
     private fun initializePlayerState(track: Track) {
+        this.track = track
         playerState = PlayerState(
-            favorite = false,
+            favorite = track.isFavorite,
             inLibrary = false,
             playbackState = PlaybackState.Prepared,
             timer = TIMER_ZERO,
@@ -162,8 +166,16 @@ class PlayerViewModel(
      * Переключает состояние "Избранного" трека
      */
     fun toggleFavorite() {
-        playerState.favorite = !playerState.favorite
-        playerStateLiveData.postValue(playerState)
+        viewModelScope.launch {
+            if (playerState.favorite) {
+                playerInteractor.removeFromFavorite(trackId)
+            } else {
+                playerInteractor.addToFavorite(track)
+            }
+
+            playerState.favorite = !playerState.favorite
+            playerStateLiveData.postValue(playerState)
+        }
     }
 
     /**

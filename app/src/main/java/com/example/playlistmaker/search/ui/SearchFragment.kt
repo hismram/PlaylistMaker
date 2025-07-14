@@ -16,9 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentSearchBinding
-import com.example.playlistmaker.search.domain.model.Track
-import com.example.playlistmaker.search.presentation.SearchAdapter
+import com.example.playlistmaker.domain.model.Track
 import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.presentation.TracksAdapter
 import com.example.playlistmaker.search.domain.model.ListState
 import com.example.playlistmaker.search.presentation.SearchViewModel
 import com.example.playlistmaker.utils.debounce
@@ -30,7 +30,7 @@ class SearchFragment : Fragment() {
     private var searchString: String = SEARCH_DEFAULT
     private var placeholderImg: Int = R.drawable.not_found
     private val tracksList: ArrayList<Track> = ArrayList()
-    private lateinit var searchAdapter: SearchAdapter
+    private lateinit var searchAdapter: TracksAdapter
     private val viewModel: SearchViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var searchDebounce: (String) -> Unit
@@ -68,7 +68,7 @@ class SearchFragment : Fragment() {
             }
         }
 
-        searchAdapter = SearchAdapter(tracksList) {
+        searchAdapter = TracksAdapter(tracksList) {
             if (trackClickAllowed) {
                 trackClickAllowed = false
                 openPlayer(it)

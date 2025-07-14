@@ -2,9 +2,11 @@ package com.example.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.example.playlistmaker.App
 import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.PreferencesClient
+import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.local.SharedPreferencesClient
 import com.example.playlistmaker.data.network.ITunesApi
 import com.example.playlistmaker.data.network.RetrofitNetworkClient
@@ -23,6 +25,14 @@ const val I_TUNES_ADDRESS = "https://itunes.apple.com/"
 const  val PREFERENCES_STORAGE_ID = "playlistmaker_storage"
 
 val dataModule = module {
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            AppDatabase::class.java,
+            "database.db"
+        ).build()
+    }
+
     single<ITunesApi> {
         Retrofit.Builder()
             .baseUrl(I_TUNES_ADDRESS)
