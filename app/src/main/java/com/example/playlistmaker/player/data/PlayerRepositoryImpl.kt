@@ -43,7 +43,7 @@ class PlayerRepositoryImpl(
     }
 
     override suspend fun readFavorite(id: Int): Track? {
-        val trackEntity = trackDao.read(id);
+        val trackEntity = trackDao.read(id)
 
         return if (trackEntity != null) {
             trackDbConverter.map(trackEntity)

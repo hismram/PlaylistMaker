@@ -21,7 +21,7 @@ class PlayerInteractorImpl(
         // Запускаем корутину для получения статуса
         CoroutineScope(Dispatchers.IO).launch {
             val history = tracksRepository.searchHistory()
-            var track: Track? = null;
+            var track: Track? = null
 
             val fromHistory = history.find { it.trackId == trackId }
             val fromFavorite = playerRepository.readFavorite(trackId)
