@@ -30,7 +30,7 @@ val dataModule = module {
             androidContext(),
             AppDatabase::class.java,
             "database.db"
-        ).build()
+        ).build().trackDao()
     }
 
     single<ITunesApi> {

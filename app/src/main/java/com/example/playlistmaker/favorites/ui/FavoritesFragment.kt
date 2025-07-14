@@ -22,7 +22,7 @@ class FavoritesFragment : Fragment() {
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = _binding!!
     private val favoritesList: ArrayList<Track> = ArrayList()
-    private lateinit var favoritesAdapter: TracksAdapter
+    private var favoritesAdapter: TracksAdapter? = null
     private val viewModel: FavoritesViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var allowTrackClickDebounce: (Track) -> Unit
@@ -80,6 +80,7 @@ class FavoritesFragment : Fragment() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
         _binding = null
+        favoritesAdapter = null
     }
 
     private fun openPlayer(track: Track) {
@@ -91,7 +92,7 @@ class FavoritesFragment : Fragment() {
     private fun showFavorites(tracks: List<Track>) {
         favoritesList.clear()
         favoritesList.addAll(tracks)
-        favoritesAdapter.notifyDataSetChanged()
+        favoritesAdapter?.notifyDataSetChanged()
 
         binding.tracksViewPlaceholder.isVisible = false
         binding.tracksView.isVisible = true
@@ -103,7 +104,7 @@ class FavoritesFragment : Fragment() {
     }
 
     companion object {
-        const val TRACK_CLICK_DELAY = 1500L
+        private const val TRACK_CLICK_DELAY = 1500L
 
         fun newInstance() = FavoritesFragment()
     }

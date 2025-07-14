@@ -29,5 +29,5 @@
     <dimen name="offset_xl">26dp</dimen>
     <dimen name="offset_2xl">28dp</dimen>
     <dimen name="offset_3xl">30dp</dimen>
-    <dimen name="offset_4xl">54dp</dimen>
+    <dimen name="offset_4xl">48dp</dimen>
 </resources>

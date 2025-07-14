@@ -30,7 +30,7 @@ class SearchFragment : Fragment() {
     private var searchString: String = SEARCH_DEFAULT
     private var placeholderImg: Int = R.drawable.not_found
     private val tracksList: ArrayList<Track> = ArrayList()
-    private lateinit var searchAdapter: TracksAdapter
+    private var searchAdapter: TracksAdapter? = null
     private val viewModel: SearchViewModel by viewModel()
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var searchDebounce: (String) -> Unit
@@ -63,6 +63,7 @@ class SearchFragment : Fragment() {
                     R.string.network_error, R.drawable.network_error
                 )
                 is ListState.Loaded -> showList(state.tracks)
+                is ListState.History -> showHistory(state.tracks)
                 ListState.Loading -> showProgressBar()
                 ListState.NotFound -> showPlaceholder(R.string.not_found, R.drawable.not_found)
             }
@@ -107,7 +108,7 @@ class SearchFragment : Fragment() {
             }
             false
         }
-        binding.tracksViewPlaceholderReload.setOnClickListener { search() }
+        binding.tracksViewPlaceholderReload.setOnClickListener { search(true) }
         binding.searchCross.setOnClickListener { resetSearch() }
 
         return binding.root
@@ -117,11 +118,14 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
         handler.removeCallbacksAndMessages(null)
         _binding = null
+        searchAdapter = null
     }
 
     private fun clearList() {
+        binding.searchHistoryHeader.isVisible = false
+        binding.searchHistoryClear.isVisible = false
         tracksList.clear()
-        searchAdapter.notifyDataSetChanged()
+        searchAdapter?.notifyDataSetChanged()
     }
 
     /**
@@ -141,9 +145,9 @@ class SearchFragment : Fragment() {
     /**
      * Запускает поиск, заполняеет список треков результом или показывает заглушку
      */
-    private fun search() {
+    private fun search(force: Boolean = false) {
         if (isAdded && binding.searchInput.text.isNotEmpty()) {
-            viewModel.search(binding.searchInput.text.toString())
+            viewModel.search(binding.searchInput.text.toString(), force)
         }
     }
 
@@ -168,7 +172,13 @@ class SearchFragment : Fragment() {
         binding.searchProgressBar.isVisible = false
         binding.tracksView.isVisible = false
         binding.tracksViewPlaceholder.isVisible = true
-        binding.tracksViewPlaceholderReload.isVisible = false
+        binding.tracksViewPlaceholderReload.isVisible = true
+    }
+
+    private fun updateTracksList(tracks: List<Track>) {
+        tracksList.clear()
+        tracksList.addAll(tracks)
+        searchAdapter?.notifyDataSetChanged()
     }
 
     /**
@@ -177,10 +187,21 @@ class SearchFragment : Fragment() {
     private fun showList(tracks: List<Track>) {
         if (!isAdded) return
 
-        tracksList.clear()
-        tracksList.addAll(tracks)
-        searchAdapter.notifyDataSetChanged()
+        updateTracksList(tracks)
+        binding.tracksViewPlaceholder.isVisible = false
+        binding.tracksViewPlaceholderReload.isVisible = false
+        binding.searchProgressBar.isVisible = false
+        binding.tracksView.isVisible = true
+        binding.searchHistoryClear.isVisible = false
+        binding.searchHistoryHeader.isVisible = false
+    }
 
+    private fun showHistory(tracks: List<Track>) {
+        if (!isAdded) return
+
+        updateTracksList(tracks)
+        binding.searchHistoryClear.isVisible = tracks.isNotEmpty()
+        binding.searchHistoryHeader.isVisible = tracks.isNotEmpty()
         binding.tracksViewPlaceholder.isVisible = false
         binding.tracksViewPlaceholderReload.isVisible = false
         binding.searchProgressBar.isVisible = false
@@ -191,6 +212,8 @@ class SearchFragment : Fragment() {
      * Показывает ожиданчик
      */
     private fun showProgressBar() {
+        binding.searchHistoryHeader.isVisible = false
+        binding.searchHistoryClear.isVisible = false
         binding.tracksViewPlaceholder.isVisible = false
         binding.tracksViewPlaceholderReload.isVisible = false
         binding.tracksView.isVisible = false
@@ -210,8 +233,8 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-        const val SEARCH_DELAY = 1500L
-        const val TRACK_CLICK_DELAY = 1500L
-        const val SEARCH_DEFAULT = ""
+        private const val SEARCH_DELAY = 1500L
+        private const val TRACK_CLICK_DELAY = 1500L
+        private const val SEARCH_DEFAULT = ""
     }
 }

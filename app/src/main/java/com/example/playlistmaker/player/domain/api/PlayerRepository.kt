@@ -9,6 +9,7 @@ interface PlayerRepository {
     suspend fun isFavorite(id: Int): Boolean
     suspend fun addToFavorite(track: Track)
     suspend fun removeFromFavorite(id: Int)
+    suspend fun readFavorite(id: Int): Track?
     fun getPlaybackTimer(): String
     fun release()
 }

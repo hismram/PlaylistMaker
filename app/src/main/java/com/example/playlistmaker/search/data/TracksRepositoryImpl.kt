@@ -75,6 +75,7 @@ class TracksRepositoryImpl(
 
     override fun clearHistory() {
         preferencesClient.doRequest(SetStringValueRequest(historyId, EMPTY_LIST))
+        historyList.clear()
     }
 
     private fun readHistory(): ArrayList<Track> {

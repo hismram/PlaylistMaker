@@ -45,6 +45,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/offset_4xl"
             android:orientation="vertical">
                 <TextView
                     android:id="@+id/search_history_header"
@@ -70,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/offset_s"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/offset_s"
+                    android:layout_marginTop="@dimen/offset_2xs"
                     android:text="@string/search_history_clear"
                 />
         </LinearLayout>
@@ -94,9 +95,9 @@
                     android:paddingLeft="@dimen/offset_s"
                     android:layout_gravity="center"
                     android:visibility="gone"
-                    android:drawableTop="@drawable/not_found"
                     android:textAlignment="center"
                     android:text=""
+                    app:drawableTopCompat="@drawable/not_found"
                     tools:text="@string/network_error"
                 />
                 <com.google.android.material.button.MaterialButton

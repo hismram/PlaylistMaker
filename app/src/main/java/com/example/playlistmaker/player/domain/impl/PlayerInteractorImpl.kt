@@ -18,18 +18,28 @@ class PlayerInteractorImpl(
         consumer: PlayerInteractor.PlayerConsumer,
         onComplete: () -> Unit
     ) {
-        val history = tracksRepository.searchHistory()
-        val track = history.find { it.trackId == trackId } ?: return
-
-        if (track.previewUrl == null) return
-
         // Запускаем корутину для получения статуса
         CoroutineScope(Dispatchers.IO).launch {
+            val history = tracksRepository.searchHistory()
+            var track: Track? = null;
+
+            val fromHistory = history.find { it.trackId == trackId }
+            val fromFavorite = playerRepository.readFavorite(trackId)
+
+            if (fromHistory != null) {
+                track = fromHistory
+            } else if (fromFavorite != null) {
+                track = fromFavorite
+            } else {
+                return@launch
+            }
+
+            if (track.previewUrl == null) return@launch
             val isFavorite = playerRepository.isFavorite(trackId)
             val updatedTrack = track.copy(isFavorite = isFavorite)
 
             playerRepository.initMediaPlayer(
-                track.previewUrl,
+                track.previewUrl!!,
                 { consumer.consume(updatedTrack) },
                 { onComplete() }
             )
