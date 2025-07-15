@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.model.ListState
-import com.example.playlistmaker.search.domain.model.Track
+import com.example.playlistmaker.domain.model.Track
 import kotlinx.coroutines.launch
 
 class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
@@ -19,8 +19,8 @@ class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
 
     fun getSearchStateLiveData(): LiveData<ListState> = searchStateLiveData
 
-    fun search(searchString: String) {
-        if (this.searchString == searchString) return
+    fun search(searchString: String, force: Boolean = false) {
+        if (this.searchString == searchString && !force) return
 
         searchStateLiveData.postValue(ListState.Loading)
         this.searchString = searchString
@@ -49,7 +49,7 @@ class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
         searchString = ""
         tracksInteractor.getHistory(object : TracksInteractor.TracksConsumer {
             override fun consume(tracks: List<Track>) {
-                searchStateLiveData.postValue(ListState.Loaded(tracks))
+                searchStateLiveData.postValue(ListState.History(tracks))
             }
 
             override fun error() {}
@@ -62,5 +62,6 @@ class SearchViewModel(val tracksInteractor: TracksInteractor): ViewModel() {
 
     fun resetHistory() {
         tracksInteractor.clearHistory()
+        searchStateLiveData.postValue(ListState.History(emptyList()))
     }
 }

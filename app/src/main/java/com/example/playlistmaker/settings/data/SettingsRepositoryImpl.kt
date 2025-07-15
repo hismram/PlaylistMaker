@@ -28,6 +28,6 @@ class SettingsRepositoryImpl(
     }
 
     companion object {
-        const val DARK_MODE_ID = "dark_theme"
+        private const val DARK_MODE_ID = "dark_theme"
     }
 }
