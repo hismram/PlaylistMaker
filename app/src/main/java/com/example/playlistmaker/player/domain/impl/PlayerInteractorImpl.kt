@@ -18,32 +18,29 @@ class PlayerInteractorImpl(
         consumer: PlayerInteractor.PlayerConsumer,
         onComplete: () -> Unit
     ) {
-        // Запускаем корутину для получения статуса
-        CoroutineScope(Dispatchers.IO).launch {
-            val history = tracksRepository.searchHistory()
-            var track: Track? = null
+        val history = tracksRepository.searchHistory()
+        var track: Track? = null
 
-            val fromHistory = history.find { it.trackId == trackId }
-            val fromFavorite = playerRepository.readFavorite(trackId)
+        val fromHistory = history.find { it.trackId == trackId }
+        val fromFavorite = playerRepository.readFavorite(trackId)
 
-            if (fromHistory != null) {
-                track = fromHistory
-            } else if (fromFavorite != null) {
-                track = fromFavorite
-            } else {
-                return@launch
-            }
-
-            if (track.previewUrl == null) return@launch
-            val isFavorite = playerRepository.isFavorite(trackId)
-            val updatedTrack = track.copy(isFavorite = isFavorite)
-
-            playerRepository.initMediaPlayer(
-                track.previewUrl!!,
-                { consumer.consume(updatedTrack) },
-                { onComplete() }
-            )
+        if (fromHistory != null) {
+            track = fromHistory
+        } else if (fromFavorite != null) {
+            track = fromFavorite
+        } else {
+            return
         }
+
+        if (track.previewUrl == null) return
+        val isFavorite = playerRepository.isFavorite(trackId)
+        val updatedTrack = track.copy(isFavorite = isFavorite)
+
+        playerRepository.initMediaPlayer(
+            track.previewUrl!!,
+            { consumer.consume(updatedTrack) },
+            { onComplete() }
+        )
     }
 
     override fun getPlaybackTimer(): String {
